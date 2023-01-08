@@ -96,9 +96,28 @@ This project follows a standard NixOS deployment process. Utilize the [`nixos/co
 
 ## Step 1: Build the application
 
+Build the application locally.
+
+```bash
+docker build -t acm-uic/simple-ts-clock:latest .
+```
+
 ## Step 2: Setup environment secrets
 
+Make a copy of the example `.env` file and populate the variables with the ones used for your setup.
+
+```bash
+cp .env.example .env
+nvim .env
+```
+
 ## Step 3: Run Docker-compose
+
+Run the application using docker-compose.
+
+```bash
+docker-compose up -d
+```
 
 # Authors
 
