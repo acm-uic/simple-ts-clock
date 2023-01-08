@@ -122,5 +122,7 @@ docker-compose up -d
 # Authors
 
 This project was originally a rewrite of [sudoclock](https://github.com/acm-uic/sudoclock) by [clee231](https://github.com/clee231).
+
 The project has since been rewritten mostly in the [simple-js-clock](https://github.com/bmiddha/simple-js-clock) repo by [bmiddha](https://github.com/bmiddha).
+
 In January 2023, the simple-js-clock repo was forked to continue development here.
