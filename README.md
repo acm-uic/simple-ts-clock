@@ -1,8 +1,6 @@
-_This project is archived. Project tempus https://github.com/bmiddha/tempus will continue the legacy of this project._
+# Simple Typescript Clock
 
-# Simple JS (Now in Typescript) Clock
-
-A clock replacement for the office of ACM@UIC
+A simple, maybe not so simple clock replacement for the office of ACM@UIC.
 
 ## Features
 
@@ -89,3 +87,42 @@ chromium-browser http://server:8080 --window-size=1080,1920 --start-fullscreen -
 Replace `http://server:8080` with nodejs server.
 
 ## Reboot
+
+# Deployment on NixOS
+
+## Step 0: Provision machine
+
+This project follows a standard NixOS deployment process. Utilize the [`nixos/configuration.nix`](./nixos/configuration.nix) file to deploy a standard NixOS installation on a given machine. This sets up [cage](https://github.com/Hjdskes/cage) which is a Wayland kiosk application. The configuration is setup to launch Google Chrome and visit a local dockerized instance of the project.
+
+## Step 1: Build the application
+
+Build the application locally.
+
+```bash
+docker build -t acm-uic/simple-ts-clock:latest .
+```
+
+## Step 2: Setup environment secrets
+
+Make a copy of the example `.env` file and populate the variables with the ones used for your setup.
+
+```bash
+cp .env.example .env
+nvim .env
+```
+
+## Step 3: Run Docker-compose
+
+Run the application using docker-compose.
+
+```bash
+docker-compose up -d
+```
+
+# Authors
+
+This project was originally a rewrite of [sudoclock](https://github.com/acm-uic/sudoclock) by [clee231](https://github.com/clee231).
+
+The project has since been rewritten mostly in the [simple-js-clock](https://github.com/bmiddha/simple-js-clock) repo by [bmiddha](https://github.com/bmiddha) and other contributors.
+
+In January 2023, the simple-js-clock repo was forked to continue development here.

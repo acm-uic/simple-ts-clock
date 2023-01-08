@@ -2,7 +2,9 @@ version: "3"
 
 services:
   clock:
-    image: "bmiddha/simple-js-clock:latest"
+    image: "acm-uic/simple-ts-clock:latest"
+    build: .
+    restart: always
     ports: 
       - ${PORT}:8080
     env_file:
@@ -10,4 +12,4 @@ services:
     environment:
       - PORT=8080
     volumes:
-      - ${SSL_DIR}:/usr/src/app/ssl
+      - ${TLS_DIR}:/usr/src/app/ssl
