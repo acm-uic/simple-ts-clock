@@ -2,12 +2,13 @@ version: "3"
 
 services:
   clock:
-    image: "bmiddha/simple-js-clock:latest"
+    image: "acm-uic/simple-ts-clock:latest"
+    restart: "always"
     ports: 
       - ${PORT}:8080
     env_file:
       - .env
     environment:
       - PORT=8080
-    volumes:
-      - ${SSL_DIR}:/usr/src/app/ssl
+#    volumes:
+#      - ${SSL_DIR}:/usr/src/app/ssl
