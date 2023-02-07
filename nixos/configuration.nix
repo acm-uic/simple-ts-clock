@@ -109,7 +109,7 @@
 
   services.cage = {
     enable = true;
-    program = "${pkgs.google-chrome}/bin/google-chrome-stable --kiosk \"http://localhost:8080\"";
+    program = "${pkgs.google-chrome}/bin/google-chrome-stable --simulate-outdated-no-au=\"01 Jan 2099\" --kiosk \"http://localhost:8080\"";
     user = "acmrunner";
     extraArguments = [ "-r" ];
   };
