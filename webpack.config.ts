@@ -1,5 +1,7 @@
 import path from "path";
 import webpack from "webpack";
+import "eslint-webpack-plugin";
+import ESLintWebpackPlugin from "eslint-webpack-plugin";
 
 const config: webpack.Configuration = {
     entry: {
@@ -12,7 +14,6 @@ const config: webpack.Configuration = {
                 test: /\.tsx?$/,
                 use: [
                     "ts-loader",
-                    "eslint-loader"
                 ],
                 exclude: /node_modules/
             },
@@ -34,10 +35,14 @@ const config: webpack.Configuration = {
             {
                 test: /\.(jpg|jpeg|gif|png|ico)$/,
                 exclude: /node_modules/,
-                loader:'file-loader?name=public/[name].[ext]'
+                loader:'file-loader',
+                options: {
+                    name: 'public/[name].[ext]'
+                }
             },
         ]
     },
+    plugins: [new ESLintWebpackPlugin({})],
     resolve: {
         extensions: [".tsx", ".ts", ".js"]
     },
