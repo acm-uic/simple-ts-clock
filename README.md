@@ -13,15 +13,16 @@ A simple, maybe not so simple clock replacement for the office of ACM@UIC.
 1. `docker` and `docker-compose` should be installed.
 2. Download just the `docker-compose.yaml` file or clone the repository.
 3. Create a `.env` file based on `.env.example`.
-4. Run `docker-compose up -d` (Run `docker build -t bmiddha/simple-js-clock:latest` before to include local changes).
+4. Run `docker-compose up -d` (Use `docker-compose up -d --build` instead to include local changes).
 
-`docker run` command
+To use `docker` without `docker compose`, run: 
 ```
 docker run -d -p 8080:8080 -e HTTPS="false" -e KEY="/root/ssl/ssl.key" -e CERT="/root/ssl/ssl.crt" -e PORT="8080" -e CTA_TRAIN_API_KEY="" -e CTA_BUS_API_KEY="" -e METRA_TRAIN_ID="" -e METRA_TRAIN_SECRET="" -e DARK_SKY_API_KEY="" -e COLORS="303030 01579B 006064 304FFE 004D40" -e BUS_STOPS="6700 6627 307 332 4640 14487 6347 206" -e TRAIN_STATIONS="40350" -e WEATHER_LAT_LONG="37.8267,-122.4233" -e UNITS="both" bmiddha/simple-js-clock
  ```
 
 ## Installation
 
+These steps seem to require python2, which does not ship with most linux distributions and is sunset. Therefore, it is recommended to run this app through docker instead (though of course, vulnerability will still exist - they will just be constrained to the container).
 1. Clone the repository.
 2. Navigate to the repository directory.
 3. Create a `.env` file based on `.env.example`.
