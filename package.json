@@ -3,6 +3,12 @@
     "version": "3.0.0",
     "description": "",
     "main": "dist/server.js",
+    "bin": {
+        "simple-ts-clock": "./dist/server.js"
+    },
+    "files": [
+        "./dist/*"
+    ],
     "scripts": {
         "clean": "rimraf ./dist/",
         "build": "npm run build-ts && npm run build-webpack",
@@ -35,7 +41,8 @@
         "express": "^4.21.2",
         "googleapis": "^144.0.0",
         "path": "^0.12.7",
-        "pug": "^3.0.3"
+        "pug": "^3.0.3",
+        "sass": "^1.84.0"
     },
     "devDependencies": {
         "@types/apicache": "^1.6.7",
