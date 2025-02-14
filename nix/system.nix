@@ -11,7 +11,7 @@
   };
 
   age.secrets.acmclock = {
-    file = "${self}/enc.env";
+    file = ../enc.env;
   };
 
   # Use the systemd-boot EFI boot loader.
