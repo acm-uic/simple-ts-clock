@@ -10,6 +10,6 @@ buildNpmPackage rec {
 
   src = "${self}";
 
-  npmDepsHash = lib.fakeHash;
+  npmDepsHash = "sha256-BALaPYoDA/cxXJ0WbmqkpbYCvu0FOX/MsoiAsE6SIAI=";
 
 }
