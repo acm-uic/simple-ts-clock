@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+nixos-rebuild switch --flake .# --build-host root@acmclock.acmuic.org --target-host root@acmclock.acmuic.org
