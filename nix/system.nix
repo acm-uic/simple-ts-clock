@@ -1,4 +1,9 @@
-{ config, pkgs, self, ... }:
+{
+  config,
+  pkgs,
+  self,
+  ...
+}:
 
 {
   imports = [
@@ -10,6 +15,8 @@
     settings.experimental-features = "nix-command flakes";
   };
 
+  nixpkgs.config.allowUnfree = true;
+
   age.secrets.acmclock = {
     file = ../enc.env;
   };
@@ -19,20 +26,12 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   networking.hostName = "acmclock"; # Define your hostname.
-  # Pick only one of the below networking options.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   networking.networkmanager.enable = true; # Easiest to use and most distros use this by default.
 
   # Set your time zone.
   time.timeZone = "America/Chicago";
 
-
-  # Enable sound.
-  # sound.enable = true;
   hardware.pulseaudio.enable = true;
-
-  # Enable touchpad support (enabled default in most desktopManager).
-  #  services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.acmrunner = {
@@ -40,6 +39,7 @@
     extraGroups = [ "docker" ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [ ];
   };
+
   users.users.acmadmin = {
     isNormalUser = true;
     extraGroups = [
@@ -57,39 +57,23 @@
     };
   };
 
-  services.cage = let
-    run = pkgs.writeScriptBin "rotator" ''
-       #!/usr/bin/env bash
-       ret=1;  
-       while test $ret -ne 0; do
-             ${pkgs.wlr-randr}/bin/wlr-randr --output DP-3 --transform=90
-             ret=$?
-       done 
-       ${pkgs.google-chrome}/bin/google-chrome-stable --disable-http-cache --simulate-outdated-no-au="01 Jan 2099" --kiosk "http://localhost:8080";
+  services.cage =
+    let
+      run = pkgs.writeScriptBin "rotator" ''
+        #!/usr/bin/env bash
+        ret=1;  
+        while test $ret -ne 0; do
+              ${pkgs.wlr-randr}/bin/wlr-randr --output DP-3 --transform=90
+              ret=$?
+        done 
+        ${pkgs.google-chrome}/bin/google-chrome-stable --disable-http-cache --simulate-outdated-no-au="01 Jan 2099" --kiosk "http://localhost:8080";
       '';
-in {
-    enable = true;
-    program = "${run}/bin/rotator";
-    user = "acmrunner";
-    # extraArguments = [ "-r" ];
-  };
-
-  # wait for network and DNS
-  # systemd.services."cage-tty1" = {
-  #   wants =  [
-  #     "graphical.target"
-  #   ];
-  #   wantedBy =  [];
-  #   before = [];
- 
-  #   # Restart cage if it closes
-  #   serviceConfig = {
-  #     Restart = "always";
-  #   };
-  #   unitConfig = {
-  #     StartLimitBurst = 10;
-  #   };
-  # };
+    in
+    {
+      enable = true;
+      program = "${run}/bin/rotator";
+      user = "acmrunner";
+    };
 
   systemd.services."acmclock" = {
     name = "acmclock.service";
@@ -101,7 +85,6 @@ in {
     };
     enable = true;
   };
- 
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -115,13 +98,6 @@ in {
     self.inputs.agenix.packages."${system}".default
   ];
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  programs.gnupg.agent = {
-    enable = true;
-    enableSSHSupport = true;
-  };
 
   # Install additional fonts for emojis and other utilized fonts
   fonts.packages = with pkgs; [
@@ -129,11 +105,6 @@ in {
     noto-fonts-cjk-sans
     noto-fonts-emoji
   ];
-
-  # Installing Docker
-  virtualisation.docker.enable = true;
-
-  # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
@@ -144,17 +115,5 @@ in {
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
-  # Copy the NixOS configuration file and link it from the resulting system
-  # (/run/current-system/configuration.nix). This is useful in case you
-  # accidentally delete configuration.nix.
-  # system.copySystemConfiguration = true;
-
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "22.11"; # Did you read the comment?
-  nixpkgs.config.allowUnfree = true;
 }
