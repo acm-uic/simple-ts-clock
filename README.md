@@ -8,117 +8,47 @@ A simple, maybe not so simple clock replacement for the office of ACM@UIC.
 * CTA Bus and Train Arrival Times
 * Weather from DarkSky
 
-## Using with docker
+# Building and deployment
 
-1. `docker` and `docker-compose` should be installed.
-2. Download just the `docker-compose.yaml` file or clone the repository.
-3. Create a `.env` file based on `.env.example`.
-4. Run `docker-compose up -d` (Use `docker-compose up -d --build` instead to include local changes).
+This project is built and deployed with the Nix package manager. The NPM
+application can be built as follows:
 
-To use `docker` without `docker compose`, run: 
-```
-docker run -d -p 8080:8080 -e HTTPS="false" -e KEY="/root/ssl/ssl.key" -e CERT="/root/ssl/ssl.crt" -e PORT="8080" -e CTA_TRAIN_API_KEY="" -e CTA_BUS_API_KEY="" -e METRA_TRAIN_ID="" -e METRA_TRAIN_SECRET="" -e DARK_SKY_API_KEY="" -e COLORS="303030 01579B 006064 304FFE 004D40" -e BUS_STOPS="6700 6627 307 332 4640 14487 6347 206" -e TRAIN_STATIONS="40350" -e WEATHER_LAT_LONG="37.8267,-122.4233" -e UNITS="both" bmiddha/simple-js-clock
- ```
-
-## Installation
-
-These steps seem to require python2, which does not ship with most linux distributions and is sunset. Therefore, it is recommended to run this app through docker instead (though of course, vulnerability will still exist - they will just be constrained to the container).
-1. Clone the repository.
-2. Navigate to the repository directory.
-3. Create a `.env` file based on `.env.example`.
-4. Run `npm install` to install dependencies.
-
-## How to use
-
-1. Run `npm run start` to start the npm server or `npm run watch` to watch for changes.
-2. Navigate the browser to `locahost:8080` or the port specified in the `.env` config.
-
-## Offline Mode
-
-Offline mode will disable api requests to the server leaving only the clock running. It can be activated by going to `/offline` path.
-
-## Demo Mode
-Demo mode works like offline mode but displays demo information instead of real data from apis. It can be activated by going to `/demo` path.
-
-## Configuration
-To override the default config, you can use the URL GET parameters or by pressing `c` to open the config options.
-
-# Deployment on a Raspberry PI
-
-## Step 0: Install Packages
-```
-sudo apt update && sudo apt upgrade -y
-sudo apt install --no-install-recommends -y chromium-browser xserver-xorg x11-xserver-utils xinit
+```sh
+nix build .#
 ```
 
-## Step 1: Enable auto-login
-Use the `raspi-config` tool to enable auto-login to the console.
-`sudo raspi-config` => Boot Options => Desktop / CLI => Console Autologin
+This will produce a symlink called "result" in your local directory. The program
+can be run as follows:
 
-## Step 2: Set console orientation
-Edit the file `/boot/config.txt`
-Add the following option:
-```
-display_rotate=3
+```sh
+./result/bin/simple-ts-clock
 ```
 
-```
-display_rotate=0 Normal
-display_rotate=1 90 degrees
-display_rotate=2 180 degrees
-display_rotate=3 270 degrees
-```
+## Deployment
 
-## Step 4: `.xinitrc` file
+To deploy to ACM's clock machine, simply run
 
-`/home/pi/.xinitrc`
-```
-#!/bin/sh
-xset -dpms
-xset s off
-xset s noblank
-
-xrandr --output default --rotate left
-
-setxkbmap -option "terminate:ctrl_alt_bksp"
-
-unclutter &
-chromium-browser http://server:8080 --window-size=1080,1920 --start-fullscreen --kiosk --incognito --noerrdialogs --disable-translate --no-first-run --fast --fast-start --disable-infobars --disable-features=TranslateUI --disk-cache-dir=/dev/null
-```
-Replace `http://server:8080` with nodejs server.
-
-## Reboot
-
-# Deployment on NixOS
-
-## Step 0: Provision machine
-
-This project follows a standard NixOS deployment process. Utilize the [`nixos/configuration.nix`](./nixos/configuration.nix) file to deploy a standard NixOS installation on a given machine. This sets up [cage](https://github.com/Hjdskes/cage) which is a Wayland kiosk application. The configuration is setup to launch Google Chrome and visit a local dockerized instance of the project.
-
-## Step 1: Build the application
-
-Build the application locally.
-
-```bash
-docker build -t acm-uic/simple-ts-clock:latest .
+```sh
+./deploy
 ```
 
-## Step 2: Setup environment secrets
+This repo is set to poll and auto upgrade the ACM clock machine every day
+automatically from the contents of this repo.
 
-Make a copy of the example `.env` file and populate the variables with the ones used for your setup.
+To deploy outside ACM, first use [agenix](https://github.com/ryantm/agenix) to
+encrypt an env file containing the secrets (based on .env.example) replace the
+current `enc.env` file. You can encrypt your file to the SSH host key of the
+target machine. The `enc.env` file in the repo will decrypt on ACM's clock
+machine.
 
-```bash
-cp .env.example .env
-nvim .env
+Then, edit the system configuration at `nix/system.nix` to your liking and
+deploy:
+
 ```
-
-## Step 3: Run Docker-compose
-
-Run the application using docker-compose.
-
-```bash
-docker-compose up -d
+nixos-rebuild switch --flake .#acmclock --build-host root@yourmachine --target-host root@yourmachine
 ```
+Make sure to change `system.autoUpgrade` to point to your repo, or disable it.
+
 
 # Authors
 
@@ -127,3 +57,6 @@ This project was originally a rewrite of [sudoclock](https://github.com/acm-uic/
 The project has since been rewritten mostly in the [simple-js-clock](https://github.com/bmiddha/simple-js-clock) repo by [bmiddha](https://github.com/bmiddha) and other contributors.
 
 In January 2023, the simple-js-clock repo was forked to continue development here.
+
+In February 2025, @SohamG and @clee231 updated the app to Node 20 and added the
+Nix-based build and deployment.
