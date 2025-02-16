@@ -17,6 +17,11 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  system.autoUpgrade = {
+    enable = true;
+    flake = "github:acm-uic/simple-ts-clock";
+  };
+
   age.secrets.acmclock = {
     file = ../enc.env;
   };
