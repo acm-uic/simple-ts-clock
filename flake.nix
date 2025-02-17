@@ -35,5 +35,15 @@
         specialArgs = { inherit self; };
       };
 
+      devShells.x86_64-linux.default = pkgs.mkShell {
+        name = "ACMclock DevShell";
+
+        packages = with pkgs; [
+          nodejs
+          typescript
+          typescript-language-server
+        ];
+      };
+
     };
 }
