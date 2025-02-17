@@ -131,6 +131,7 @@ body {
 .wrapper {
     width: 1080px;
     height: 1920px;
+    max-height: 100%;
     border: 1px solid #000000;
     display: grid;
     grid-template-areas: 'time time time weather weather' 'date date date date date' 'messages messages messages messages messages' 'switcher switcher switcher switcher switcher' 'footer footer footer footer footer';
@@ -147,6 +148,7 @@ body {
     }
     #switcher {
         grid-area: switcher;
+	overflow: hidden;
     }
     #messages {
         grid-area: messages;
