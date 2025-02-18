@@ -80,6 +80,12 @@
       user = "acmrunner";
     };
 
+  systemd.services."cage-tty1" = {
+    serviceConfig = {
+      Restart = "always";
+    };
+  };
+
   systemd.services."acmclock" = {
     name = "acmclock.service";
     wantedBy = [ "multi-user.target" ];
