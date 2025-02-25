@@ -81,6 +81,7 @@
     };
 
   systemd.services."cage-tty1" = {
+    wantedBy = ["sysinit-reactivation.target"];
     serviceConfig = {
       Restart = "always";
     };
