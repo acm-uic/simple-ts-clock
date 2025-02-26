@@ -19,6 +19,7 @@
 
   system.autoUpgrade = {
     enable = true;
+    allowReboot = true;
     flake = "github:acm-uic/simple-ts-clock";
   };
 
