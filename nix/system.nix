@@ -22,6 +22,14 @@
     flake = "github:acm-uic/simple-ts-clock";
   };
 
+  systemd.services."nixos-upgrade".onSuccess = [ "my-reboot.service" ];
+
+  systemd.services.my-reboot = {
+    name = "my-reboot.service";
+    script = "${pkgs.systemd}/bin/shutdown -r +1";
+    enable = true;
+  };
+
   age.secrets.acmclock = {
     file = ../enc.env;
   };
