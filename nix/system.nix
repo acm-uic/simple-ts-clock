@@ -127,14 +127,24 @@
     noto-fonts-emoji
   ];
 
+  systemd.services."my-nebula" = {
+    wantedBy = [ "multi-user.target"];
+    enable = true;
+    serviceConfig = {
+      Type="notify";
+      ExecStart="${pkgs.nebula}/bin/nebula -config /root/config-acmclock.yml";
+      Restart="always";
+    };
+  };
+
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
 
   # Open ports in the firewall.
-  networking.firewall.allowedTCPPorts = [ 22 ];
+  # networking.firewall.allowedTCPPorts = [ 22 ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.firewall.enable = false;
 
   system.stateVersion = "22.11"; # Did you read the comment?
 }
