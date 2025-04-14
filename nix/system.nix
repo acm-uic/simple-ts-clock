@@ -132,7 +132,7 @@
     enable = true;
     serviceConfig = {
       Type="notify";
-      ExecStart="${pkgs.nebula}/bin/nebula -config /root/config-acmclock.yml";
+      ExecStart="/usr/local/bin/nebula -config /etc/nebula.yml";
       Restart="always";
     };
   };
