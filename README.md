@@ -24,6 +24,27 @@ can be run as follows:
 ./result/bin/simple-ts-clock
 ```
 
+## Usage
+1. Clone the repository.
+2. Navigate to the repository directory.
+3. Create a `.env` file based on `.env.example`.
+4. Run `npm install` to install dependencies.
+
+### How to use
+
+1. Run `npm run start` to start the npm server or `npm run watch` to watch for changes.
+2. Navigate the browser to `locahost:8080` or the port specified in the `.env` config.
+
+### Offline Mode
+
+Offline mode will disable api requests to the server leaving only the clock running. It can be activated by going to `/offline` path.
+
+### Demo Mode
+Demo mode works like offline mode but displays demo information instead of real data from apis. It can be activated by going to `/demo` path.
+
+### Configuration
+To override the default config, you can use the URL GET parameters or by pressing `c` to open the config options.
+
 ## Deployment
 
 To deploy to ACM's clock machine, simply run
