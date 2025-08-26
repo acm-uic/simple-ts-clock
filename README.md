@@ -29,6 +29,7 @@ can be run as follows:
 2. Navigate to the repository directory.
 3. Create a `.env` file based on `.env.example`.
 4. Run `npm install` to install dependencies.
+5. Run `npm run build` to make `npm run start` work (I haven't investigated why this is necessary).
 
 ### How to use
 
