@@ -74,12 +74,12 @@
     let
       run = pkgs.writeScriptBin "rotator" ''
         #!/usr/bin/env bash
-        ret=1;  
+        ret=1;
         while test $ret -ne 0; do
               ${pkgs.wlr-randr}/bin/wlr-randr --output DP-3 --transform=90
               ret=$?
-        done 
-        ${pkgs.google-chrome}/bin/google-chrome-stable --disable-http-cache --simulate-outdated-no-au="01 Jan 2099" --kiosk "http://localhost:8080";
+        done
+        ${pkgs.google-chrome}/bin/google-chrome-stable --disable-http-cache --simulate-outdated-no-au="01 Jan 2099" --kiosk "http://localhost:8080/only-qr-codes";
       '';
     in
     {
