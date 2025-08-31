@@ -7,6 +7,7 @@ A simple, maybe not so simple clock replacement for the office of ACM@UIC.
 * Time and Date
 * CTA Bus and Train Arrival Times
 * Weather from DarkSky
+* QR Codes for ACM and LUG Discords, and a QR code for the app repository
 
 # Building and deployment
 
@@ -28,6 +29,7 @@ can be run as follows:
 1. Clone the repository.
 2. Navigate to the repository directory.
 3. Create a `.env` file based on `.env.example`.
+4. Optionally modify the values (not the keys) of `src/qrCodeUrls.ts` to point to up-to-date URLs for the Discord and the repository for this project, if they've changed. Please commit those changes.
 4. Run `npm install` to install dependencies.
 5. Run `npm run build` to make `npm run start` work (I haven't investigated why this is necessary).
 
@@ -42,6 +44,9 @@ Offline mode will disable api requests to the server leaving only the clock runn
 
 ### Demo Mode
 Demo mode works like offline mode but displays demo information instead of real data from apis. It can be activated by going to `/demo` path.
+
+### Only QR Codes Mode
+To show only QR codes, got to the `/only-qr-codes` path. This is currently the only way to see the QR codes, but this will change in a future version - they will be visible in all modes.
 
 ### Configuration
 To override the default config, you can use the URL GET parameters or by pressing `c` to open the config options.

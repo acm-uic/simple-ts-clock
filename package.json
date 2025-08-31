@@ -11,8 +11,10 @@
         "./views/*"
     ],
     "scripts": {
+      "webpack-help": "webpack-cli --help",
         "clean": "rimraf ./dist/",
-        "build": "npm run build-ts && npm run build-webpack",
+        "build": "npm run build-ts && npm run build-webpack && npm run generate:qr",
+        "generate:qr": "ts-node scripts/generate-qr.ts",
         "build-ts": "tsc",
         "watch-ts": "tsc -w",
         "build-webpack": "webpack-cli --mode production",
@@ -34,6 +36,7 @@
     "homepage": "https://github.com/bmiddha/simple-js-clock#readme",
     "dependencies": {
         "@fortawesome/fontawesome-free": "^6.7.2",
+        "@types/qrcode": "^1.5.5",
         "apicache": "^1.6.3",
         "body-parser": "^1.20.3",
         "compression": "^1.8.0",
@@ -66,6 +69,7 @@
         "node-fetch": "^2.7.0",
         "nodemon": "^3.1.9",
         "prettier": "^3.5.0",
+        "qrcode": "^1.5.4",
         "rimraf": "^6.0.1",
         "sass-loader": "^16.0.4",
         "style-loader": "^4.0.0",
