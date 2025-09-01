@@ -47,7 +47,6 @@ window.onload = (): void => {
 
     if (mode !== "only-qr-codes") {
       for (const el of document.getElementsByClassName("qrCode")) {
-        console.log("Hi");
         (el as HTMLElement).style.display = "none";
       }
     }
