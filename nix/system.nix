@@ -19,7 +19,7 @@
 
   system.autoUpgrade = {
     enable = true;
-    flake = "github:acm-uic/simple-ts-clock";
+    flake = "github:samuel-skean/acm-simple-ts-clock/no-good-very-bad-prod";
   };
 
   systemd.services."nixos-upgrade".onSuccess = [ "my-reboot.service" ];
@@ -74,11 +74,11 @@
     let
       run = pkgs.writeScriptBin "rotator" ''
         #!/usr/bin/env bash
-        ret=1;  
+        ret=1;
         while test $ret -ne 0; do
               ${pkgs.wlr-randr}/bin/wlr-randr --output DP-3 --transform=90
               ret=$?
-        done 
+        done
         ${pkgs.google-chrome}/bin/google-chrome-stable --disable-http-cache --simulate-outdated-no-au="01 Jan 2099" --kiosk "http://localhost:8080";
       '';
     in
