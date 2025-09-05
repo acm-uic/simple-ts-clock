@@ -311,34 +311,6 @@ body {
     }
 }
 
-.qrCode {
-    display: none;
-}
-
-#lug-discord-qr-code {
-    position: fixed;
-    top: 490px;
-    left: 543px;
-    width: 450px;
-    height: 450px;
-}
-
-#acm-discord-qr-code {
-    position: fixed;
-    top: 1070px;
-    left: 543px;
-    width: 450px;
-    height: 450px;
-}
-
-#app-repo-qr-code {
-    position: fixed;
-    top: 1660px;
-    left: 720px;
-    width: 150px;
-    height: 150px;
-}
-
 #footer {
     text-align: center;
     font-size: 0.5em;

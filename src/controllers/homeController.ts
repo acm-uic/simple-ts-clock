@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { qrCodeUrls } from "../qrCodeUrls";
 
 interface ExplictAnyIndex {
     [key: string]: any; // Add index signature
@@ -21,14 +20,19 @@ export let index = (req: Request, res: Response): void => {
 };
 
 export let config = (req: Request, res: Response): void => {
-  res.locals.qrCodeUrls = qrCodeUrls;
-  res.render("home", {
+    res.render("home", {
         title: "Home"
     });
 }
 
-export let offline = config;
+export let offline = (req: Request, res: Response): void => {
+    res.render("home", {
+        title: "Home"
+    });
+}
 
-export let demo = config;
-
-export let onlyQrCodes = config;
+export let demo = (req: Request, res: Response): void => {
+    res.render("home", {
+        title: "Home"
+    });
+}
