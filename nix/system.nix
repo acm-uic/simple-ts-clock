@@ -46,6 +46,10 @@
 
   hardware.pulseaudio.enable = true;
 
+  # This can mean the state of the computer takes precedence over updates to this file on redeploy, see here for docs:
+  # https://search.nixos.org/options?channel=25.05&show=users.mutableUsers&size=30&sort=relevance&query=mutable
+  users.mutableUsers = true;
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.acmrunner = {
     isNormalUser = true;
