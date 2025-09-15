@@ -60,11 +60,12 @@
       "docker"
     ]; # Enable ‘sudo’ for the user.
     packages = with pkgs; [ ];
-    hashedPassword = "$6$HduAaAHn/F1Ji1x0$DLwEDbLHNJTlD4MAQ4KseOpM5/q2BPOMzjZLDMqxl63CnsfQhW4EdODRQsWkxwtJc4Jl1mED/MYj8I9u3CDak.";
+    hashedPassword = "$y$j9T$xf/XIEZUJFGqtUYcD5Hz31$P3sA7V/W13A3k/NnurXkpOeVwJQ0uOtGYMFgXr6TY61";
     openssh = {
       authorizedKeys = {
         keys = [
           "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDoa0YA2ib7vs3VgjivUW1BL/1qVCq6+tMbx91NdDU5EljYYT9ToaGisaT8/OcbmsUAES0t/lDa65v26PWR9yhuj1UJoqVNZfnQTvaGaVaXWrBEY1wEb+bxJNws1xTUzjTwuWkH0uKz/vwpNzAPzMnLGAjcnLcwm4Yvxd9Ec76U835Cl8wI8/f51flHChkPi5HKQSYAR3aM1ZJ+j93pe5XxXA6l5QTDm4+3nmZHzzbYODSAznkTfPQ5F/iXG0xNN3zRaiBcYIbG/MV644U+ycdy7kAB3AMgwjgz2TaChBy5wQt81U7shAQGVY4NKruhXa/gRltYJ7fqkbTT97fQ3Spho1A9/ZtftAFKZAeGfBPHg/WglUFNpbg8LMgCOfUNcfXcNB1DkzorIj41zQuTGoRAB5U3DGbIvayH11v0WRAVpd/+TRjpln2Mr+Idvf7qs+uxUkUR+qVP65GI6dIyWKEsLpRTr85PbrRsNkEThG1F7Yp+bUZ57SpmnWHUob0en3k= chase"
+	  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEpwZBQVWu8V8LpEyCYqYEwC6G2tRs4viimz6dlMlNDt samuelskean@Samuels-MacBook-Air.local"
         ];
       };
     };
