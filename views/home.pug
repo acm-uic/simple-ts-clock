@@ -20,6 +20,7 @@ block content
         input.btn(type="button",value="Load Defaults",onClick="window.location.href='/'")
         input.btn(type="button",value="Offline Mode",onClick="window.location.href='/offline'")
         input.btn(type="button",value="Demo Mode",onClick="window.location.href='/demo'")
+        input.btn(type="button",value="Only QR Codes",onClick="window.location.href='/only-qr-codes'")
     script.
         const paramsString = window.location.href.split("?")[1];
         const searchParams = new URLSearchParams(paramsString);
@@ -34,9 +35,18 @@ block content
   #time
   #date
   #weather
-  #messages
-  #switcher
-    #transit
-      #cta
-        ul#bus
-        ul#train
+  #messages.tracker
+  #switcher.tracker
+    #transit.tracker
+      #cta.tracker
+        ul#bus.tracker
+        ul#train.tracker
+  
+  div.qrCode(style="position: fixed; top: 490px; left: 100px; font-size: 1.3em;") ACM Discord:
+    a.qrCode(href=qrCodeUrls['acmDiscord'])
+      img.qrCode#acm-discord-qr-code(src="/qr/acmDiscord.svg" alt="QR code for ACM Discord Server")
+  div.qrCode(style="position: fixed; top: 1070px; left: 100px; font-size: 1.3em;") LUG Discord:
+    a.qrCode(href=qrCodeUrls['lugDiscord'])
+      img.qrCode#lug-discord-qr-code(src="/qr/lugDiscord.svg" alt="QR code for LUG Discord Server")
+  a.qrCode(href=qrCodeUrls['appRepo'])
+    img.qrCode#app-repo-qr-code(src="/qr/appRepo.svg" alt="QR code for the repository for this app")

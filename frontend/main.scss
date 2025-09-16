@@ -311,6 +311,34 @@ body {
     }
 }
 
+.qrCode {
+    display: none;
+}
+
+#acm-discord-qr-code {
+	position: absolute;
+	top: 8px;
+	left: 443px;
+	width: 450px;
+	height: 450px;
+}
+
+#lug-discord-qr-code {
+	position: absolute;
+	top: 13px;
+	left: 443px;
+	width: 450px;
+	height: 450px;
+}
+
+#app-repo-qr-code {
+    position: absolute;
+    top: 1660px;
+    left: 720px;
+    width: 150px;
+    height: 150px;
+}
+
 #footer {
     text-align: center;
     font-size: 0.5em;
