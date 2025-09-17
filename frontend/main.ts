@@ -71,7 +71,7 @@ window.onload = (): void => {
             (el as HTMLElement).style.display = "none";
           }
           for (const el of document.getElementsByClassName("qrCode")) {
-            (el as HTMLElement).style.display = "inline";
+            (el as HTMLElement).style.display = "";
           }
           break; 
         default:
