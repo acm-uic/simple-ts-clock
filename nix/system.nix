@@ -19,7 +19,7 @@
 
   system.autoUpgrade = {
     enable = true;
-    flake = "github:samuel-skean/acm-simple-ts-clock/no-good-very-bad-prod";
+    flake = "github:acm-uic/simple-ts-clock";
   };
 
   systemd.services."nixos-upgrade".onSuccess = [ "my-reboot.service" ];
