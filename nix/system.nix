@@ -84,7 +84,8 @@
               ${pkgs.wlr-randr}/bin/wlr-randr --output DP-3 --transform=90
               ret=$?
         done
-        ${pkgs.google-chrome}/bin/google-chrome-stable --disable-http-cache --simulate-outdated-no-au="01 Jan 2099" --kiosk "http://localhost:8080/only-qr-codes";
+	rm -r ~/.cache/google-chrome
+        ${pkgs.google-chrome}/bin/google-chrome-stable --simulate-outdated-no-au="01 Jan 2099" --kiosk "http://localhost:8080/only-qr-codes";
       '';
     in
     {
