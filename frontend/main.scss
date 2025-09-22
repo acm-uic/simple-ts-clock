@@ -315,18 +315,32 @@ body {
     display: none;
 }
 
+#acm-discord-qr-code-label {
+    position: absolute;
+    top: 701px;
+    left: 100px;
+    font-size: 1.3em;
+}
+
 #acm-discord-qr-code {
 	position: absolute;
-	top: 8px;
-	left: 443px;
+	top: 512px;
+	left: 550px;
 	width: 450px;
 	height: 450px;
 }
 
+#lug-discord-qr-code-label {
+    position: absolute;
+    top: 1258px;
+    left: 100px;
+    font-size: 1.3em;
+}
+
 #lug-discord-qr-code {
 	position: absolute;
-	top: 13px;
-	left: 443px;
+	top: 1090px;
+	left: 550px;
 	width: 450px;
 	height: 450px;
 }

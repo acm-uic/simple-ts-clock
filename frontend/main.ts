@@ -46,10 +46,8 @@ window.onload = (): void => {
     setInterval(updateTime, 5000);
 
     if (mode !== "only-qr-codes") {
-      for (const el of document.getElementsByClassName("qrCode")) {
-        (el as HTMLElement).style.display = "none";
-      }
-    } 
+      (document.getElementById("qrCodes") as HTMLElement).style.display = "none";
+    }
 
     switch (mode) {
         case "demo":
@@ -70,10 +68,9 @@ window.onload = (): void => {
           for (const el of document.getElementsByClassName("tracker")) {
             (el as HTMLElement).style.display = "none";
           }
-          for (const el of document.getElementsByClassName("qrCode")) {
-            (el as HTMLElement).style.display = "block";
-          }
-          break; 
+          (document.getElementById("qrCodes") as HTMLElement).style.display = "block";
+
+          break;
         default:
             getData();
             setInterval(getData, 120000);
@@ -105,5 +102,5 @@ window.onload = (): void => {
 
     setInterval((): void => {
         window.location.reload();
-    }, 7200000); 
+    }, 7200000);
 }

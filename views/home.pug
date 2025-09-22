@@ -41,12 +41,13 @@ block content
       #cta.tracker
         ul#bus.tracker
         ul#train.tracker
-  
-  div.qrCode(style="position: fixed; top: 490px; left: 100px; font-size: 1.3em;") ACM Discord:
-    a.qrCode(href=qrCodeUrls['acmDiscord'])
-      img.qrCode#acm-discord-qr-code(src="/qr/acmDiscord.svg" alt="QR code for ACM Discord Server")
-  div.qrCode(style="position: fixed; top: 1070px; left: 100px; font-size: 1.3em;") LUG Discord:
-    a.qrCode(href=qrCodeUrls['lugDiscord'])
-      img.qrCode#lug-discord-qr-code(src="/qr/lugDiscord.svg" alt="QR code for LUG Discord Server")
-  a.qrCode(href=qrCodeUrls['appRepo'])
-    img.qrCode#app-repo-qr-code(src="/qr/appRepo.svg" alt="QR code for the repository for this app")
+
+  div#qrCodes
+    div#acm-discord-qr-code-label ACM Discord:
+    a(href=qrCodeUrls['acmDiscord'])
+      img#acm-discord-qr-code(src="/qr/acmDiscord.svg" alt="QR code for ACM Discord Server")
+    div#lug-discord-qr-code-label LUG Discord:
+    a(href=qrCodeUrls['lugDiscord'])
+      img#lug-discord-qr-code(src="/qr/lugDiscord.svg" alt="QR code for LUG Discord Server")
+    a(href=qrCodeUrls['appRepo'])
+      img#app-repo-qr-code(src="/qr/appRepo.svg" alt="QR code for the repository for this app")
