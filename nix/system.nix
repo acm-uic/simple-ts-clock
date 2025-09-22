@@ -124,6 +124,7 @@
     docker-compose
     self.inputs.agenix.packages."${system}".default
     ffmpeg_6
+    tmux
   ];
 
 
