@@ -85,7 +85,7 @@
               ret=$?
         done
 	rm -r ~/.cache/google-chrome
-        ${pkgs.google-chrome}/bin/google-chrome-stable --simulate-outdated-no-au="01 Jan 2099" --kiosk "http://localhost:8080/only-qr-codes";
+        ${pkgs.google-chrome}/bin/google-chrome-stable --simulate-outdated-no-au="01 Jan 2099" --kiosk "http://localhost:8080";
       '';
     in
     {
@@ -124,6 +124,7 @@
     docker-compose
     self.inputs.agenix.packages."${system}".default
     ffmpeg_6
+    tmux
   ];
 
 
