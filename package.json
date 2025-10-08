@@ -46,7 +46,8 @@
         "path": "^0.12.7",
         "pug": "^3.0.3",
         "qrcode": "^1.5.4",
-        "sass": "^1.84.0"
+        "sass": "^1.84.0",
+        "sharp": "^0.34.4"
     },
     "devDependencies": {
         "@types/apicache": "^1.6.7",
