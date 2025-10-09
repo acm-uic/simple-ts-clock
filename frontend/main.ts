@@ -47,7 +47,7 @@ window.onload = (): void => {
 
     if (mode !== "only-qr-codes") {
       for (const el of document.getElementsByClassName("qrCode")) {
-        (el as HTMLElement).style.display = "none";
+        (el as HTMLElement).classList.remove("onlyQrCodes");
       }
     } 
 
@@ -72,7 +72,9 @@ window.onload = (): void => {
           }
           for (const el of document.getElementsByClassName("qrCode")) {
             (el as HTMLElement).style.display = "block";
+            (el as HTMLElement).classList.add("onlyQrCodes");
           }
+          
           break; 
         default:
             getData();

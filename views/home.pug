@@ -42,11 +42,11 @@ block content
         ul#bus.tracker
         ul#train.tracker
   
-  div.qrCode(style="position: fixed; top: 490px; left: 100px; font-size: 3em;") ACM:
-    a.qrCode(href=qrCodeUrls['acmDiscord'])
-      img.qrCode#acm-discord-qr-code(src="/qr/acmDiscord.png" alt="QR code for ACM Discord Server")
-  div.qrCode(style="position: fixed; top: 1070px; left: 100px; font-size: 3em;") LUG:
-    a.qrCode(href=qrCodeUrls['lugDiscord'])
-      img.qrCode#lug-discord-qr-code(src="/qr/lugDiscord.png" alt="QR code for LUG Discord Server")
+  div.qrCode.qrCodeLabel#acm-discord-qr-code-label ACM:
+  a.qrCode.acm-discord-qr-code(href=qrCodeUrls['acmDiscord'])
+    img.qrCode(src="/qr/acmDiscord.png" alt="QR code for ACM Discord Server")
+  div.qrCode.qrCodeLabel#lug-discord-qr-code-label LUG:
+  a.qrCode.lug-discord-qr-code(href=qrCodeUrls['lugDiscord'])
+    img.qrCode(src="/qr/lugDiscord.png" alt="QR code for LUG Discord Server")
   a.qrCode(href=qrCodeUrls['appRepo'])
     img.qrCode#app-repo-qr-code(src="/qr/appRepo.png" alt="QR code for the repository for this app")

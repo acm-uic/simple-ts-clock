@@ -196,16 +196,7 @@ body {
 }
 
 #messages {
-    text-align: center;
-    position: relative;
-    p {
-        width: 100%;
-        margin: 0;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-    }
+    display: none;
 }
 
 #cta {
@@ -311,27 +302,75 @@ body {
     }
 }
 
-.qrCode {
-    display: none;
+.qrCodeLabel {
+    font-size: 1em;
+    position: absolute;
+    top: 468px;
 }
 
-#acm-discord-qr-code {
-	position: absolute;
-	top: 8px;
-	left: 443px;
-	width: 450px;
-	height: 450px;
+#acm-discord-qr-code-label {
+	left: 103px;
 }
 
-#lug-discord-qr-code {
+#lug-discord-qr-code-label {
+	left: 606px;
+}
+
+.onlyQrCodes.qrCodeLabel {
+    position: fixed;
+    left: 100px;
+    font-size: 3em;
+}
+
+.onlyQrCodes.acm-discord-qr-code-label {
+    top: 490px;
+}
+
+.onlyQrCodes.lug-discord-qr-code-label {
+    top: 1070px;
+}
+
+a.qrCode {
+    top: 409px;
+}
+
+img.qrCode {
+    width: 200px;
+	height: 200px;
+}
+
+.acm-discord-qr-code {
 	position: absolute;
-	top: 13px;
-	left: 443px;
-	width: 450px;
-	height: 450px;
+	left: 277px;
+}
+
+.lug-discord-qr-code {
+	position: absolute;
+	left: 776px;
 }
 
 #app-repo-qr-code {
+    display: none;
+}
+
+.onlyQrCodes img.qrCode {
+    width: 450px;
+	height: 450px;
+}
+
+.onlyQrCodes a.acm-discord-qr-code {
+	position: absolute;
+	top: 527px;
+	left: 493px;
+}
+
+.onlyQrCodes .lug-discord-qr-code {
+	position: absolute;
+	top: 1100px;
+	left: 493px;
+}
+
+.onlyQrCodes #app-repo-qr-code {
     position: absolute;
     top: 1660px;
     left: 720px;
