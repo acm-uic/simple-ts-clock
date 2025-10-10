@@ -39,17 +39,10 @@ function switcher(): void {
     counter++;
 }
 
-
 window.onload = (): void => {
     const mode = window.location.pathname.split("/")[1];
     updateTime();
     setInterval(updateTime, 5000);
-
-    if (mode !== "only-qr-codes") {
-      for (const el of document.getElementsByClassName("qrCode")) {
-        (el as HTMLElement).classList.remove("onlyQrCodes");
-      }
-    } 
 
     switch (mode) {
         case "demo":
@@ -66,16 +59,6 @@ window.onload = (): void => {
         case "offline":
             document.getElementById(`${mode}Mode`).style.display = "block";
             break;
-        case "only-qr-codes":
-          for (const el of document.getElementsByClassName("tracker")) {
-            (el as HTMLElement).style.display = "none";
-          }
-          for (const el of document.getElementsByClassName("qrCode")) {
-            (el as HTMLElement).style.display = "block";
-            (el as HTMLElement).classList.add("onlyQrCodes");
-          }
-          
-          break; 
         default:
             getData();
             setInterval(getData, 120000);

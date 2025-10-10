@@ -20,15 +20,14 @@ export let index = (req: Request, res: Response): void => {
     }
 };
 
-export let onlyQrCodes = (req: Request, res: Response): void => {
+export let config = (req: Request, res: Response): void => {
   res.locals.qrCodeUrls = qrCodeUrls;
   res.render("home", {
     title: "Home"
   });
 }
 
-export let config = onlyQrCodes;
 
-export let offline = onlyQrCodes;
+export let offline = config;
 
-export let demo = onlyQrCodes;
+export let demo = config;

@@ -33,7 +33,6 @@ app.get("/", homeController.index);
 app.get("/config", homeController.config);
 app.get("/offline", homeController.offline);
 app.get("/demo", homeController.demo);
-app.get("/only-qr-codes", homeController.onlyQrCodes);
 app.get("/api/ctaBus", ctaBusController.ctaBus);
 app.get("/api/ctaTrain", ctaTrainController.ctaTrain);
 app.get("/api/weather", weatherController.weather);

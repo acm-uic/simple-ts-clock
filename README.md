@@ -45,9 +45,6 @@ Offline mode will disable api requests to the server leaving only the clock runn
 ### Demo Mode
 Demo mode works like offline mode but displays demo information instead of real data from apis. It can be activated by going to `/demo` path.
 
-### Only QR Codes Mode
-To show only QR codes, got to the `/only-qr-codes` path. This is currently the only way to see the QR codes, but this will change in a future version - they will be visible in all modes.
-
 ### Configuration
 To override the default config, you can use the URL GET parameters or by pressing `c` to open the config options.
 
