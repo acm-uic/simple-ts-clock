@@ -9,7 +9,7 @@
 body {
     margin: 0;
     font-family: Montserrat, sans-serif;
-    font-size: 3em;
+    font-size: 2.5em;
     color: #ffffff;
     background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
     background-size: 400% 400%;
@@ -92,7 +92,8 @@ ul {
             input {
                 border-bottom: 1px solid;
             }
-            label, input {
+            label,
+            input {
                 display: block;
                 color: inherit;
                 width: 500px;
@@ -134,9 +135,9 @@ body {
     max-height: 100%;
     border: 1px solid #000000;
     display: grid;
-    grid-template-areas: 'time time time weather weather' 'date date date date date' 'messages messages messages messages messages' 'switcher switcher switcher switcher switcher' 'footer footer footer footer footer';
+    grid-template-areas: 'time time time weather weather' 'date date date date date' 'acm-discord-qr-code-label acm-discord-qr-code lug-discord-qr-code-label lug-discord-qr-code messages' 'switcher switcher switcher switcher switcher' 'footer footer footer footer footer';
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-    grid-template-rows: 0.75fr 0.3fr 0.9fr 4.1fr 0.18fr;
+    grid-template-rows: 0.6fr 0.2fr 0.9fr 4fr 0.18fr;
     #time {
         grid-area: time;
     }
@@ -148,10 +149,27 @@ body {
     }
     #switcher {
         grid-area: switcher;
-	overflow: hidden;
+        overflow: hidden;
     }
-    #messages {
-        grid-area: messages;
+    #acm-discord-qr-code-label {
+        grid-area: acm-discord-qr-code-label;
+        place-self: center;
+        line-height: inherit;
+        text-align: center;
+    }
+    #acm-discord-qr-code {
+        grid-area: acm-discord-qr-code;
+        place-self: center;
+    }
+    #lug-discord-qr-code-label {
+        grid-area: lug-discord-qr-code-label;
+        place-self: center;
+        line-height: inherit;
+        text-align: center;
+    }
+    #lug-discord-qr-code {
+        grid-area: lug-discord-qr-code;
+        place-self: center;
     }
     #footer {
         grid-area: footer;
@@ -160,6 +178,7 @@ body {
 
 // Switcher
 #switcher {
+    margin: 0px 0px 100px 0px;
     position: relative;
     & > div {
         width: 100%;
@@ -302,80 +321,13 @@ body {
     }
 }
 
-.qrCodeLabel {
-    font-size: 1em;
-    position: absolute;
-    top: 468px;
-}
-
-#acm-discord-qr-code-label {
-	left: 103px;
-}
-
-#lug-discord-qr-code-label {
-	left: 606px;
-}
-
-.onlyQrCodes.qrCodeLabel {
-    position: fixed;
-    left: 100px;
-    font-size: 3em;
-}
-
-.onlyQrCodes.acm-discord-qr-code-label {
-    top: 490px;
-}
-
-.onlyQrCodes.lug-discord-qr-code-label {
-    top: 1070px;
-}
-
-a.qrCode {
-    top: 409px;
-}
-
 img.qrCode {
     width: 200px;
-	height: 200px;
-}
-
-.acm-discord-qr-code {
-	position: absolute;
-	left: 277px;
-}
-
-.lug-discord-qr-code {
-	position: absolute;
-	left: 776px;
+    height: 200px;
 }
 
 #app-repo-qr-code {
     display: none;
-}
-
-.onlyQrCodes img.qrCode {
-    width: 450px;
-	height: 450px;
-}
-
-.onlyQrCodes a.acm-discord-qr-code {
-	position: absolute;
-	top: 527px;
-	left: 493px;
-}
-
-.onlyQrCodes .lug-discord-qr-code {
-	position: absolute;
-	top: 1100px;
-	left: 493px;
-}
-
-.onlyQrCodes #app-repo-qr-code {
-    position: absolute;
-    top: 1660px;
-    left: 720px;
-    width: 150px;
-    height: 150px;
 }
 
 #footer {
