@@ -10,5 +10,5 @@ buildNpmPackage rec {
 
   src = ../.;
 
-  npmDepsHash = "sha256-07OKhqsC06cn0/R1eAhXylw3WobFVGDAaIz5bHMn06o=";
+  npmDepsHash = "sha256-7t0Xmxk2XKgJh3/pjeIiPl8Mp8coA6mWLGGe/InCSjY=";
 }
