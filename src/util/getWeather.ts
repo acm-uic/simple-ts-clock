@@ -9,7 +9,7 @@ let lastResponse: {};
 // 15 minutes in millis
 const rateLimit: number = 15 * 60 * 1000;
 
-async function getWeather(weatherLatLong: string): Promise<{}> {
+async function getWeather(weatherLatLong: string) {
   const now: number = Date.now();
 
   let answer: {};
