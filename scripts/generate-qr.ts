@@ -1,9 +1,11 @@
 // samuel-skean: This was copied and pasted from ChatGPT, with minimal modifications. I have audited it, but this is also the first node code I've written.
-import QRCode, { toFile } from 'qrcode';
-import sharp from 'sharp';
-import { mkdirSync, readFileSync, rmSync } from 'fs';
+
+import { mkdirSync, rmSync } from 'node:fs';
 import { resolve } from 'path';
+import QRCode from 'qrcode';
+import sharp from 'sharp';
 import { qrCodeUrls } from '../src/qrCodeUrls';
+
 async function generate() {
   const qrCodeDirectoryPath = resolve(__dirname, '../dist/public/qr/');
   rmSync(qrCodeDirectoryPath, { recursive: true, force: true });

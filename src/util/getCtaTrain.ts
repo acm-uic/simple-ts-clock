@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import fetch from 'node-fetch';
+
 dotenv.config();
 
 function getCtaTrain(trainStation: string): Promise<{}> {

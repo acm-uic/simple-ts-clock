@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-import app from './app';
+import fs from 'node:fs';
+import http from 'node:http';
+import https from 'node:https';
 import dotenv from 'dotenv';
-import http from 'http';
-import https from 'https';
-import fs from 'fs';
 import path from 'path';
+import app from './app';
 
 dotenv.config();
 

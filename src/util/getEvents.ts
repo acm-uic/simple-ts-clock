@@ -1,8 +1,8 @@
-import fs from 'fs';
-import readline from 'readline';
+import fs from 'node:fs';
+import readline from 'node:readline';
+import dotenv from 'dotenv';
 import { google } from 'googleapis';
 import type { OAuth2Client } from 'googleapis-common';
-import dotenv from 'dotenv';
 
 dotenv.config();
 

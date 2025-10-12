@@ -1,18 +1,19 @@
-import express from 'express';
-import dotenv from 'dotenv';
-import cors from 'cors';
-import path from 'path';
-import compression from 'compression';
-import bodyParser from 'body-parser';
 import apicache from 'apicache';
+import bodyParser from 'body-parser';
+import compression from 'compression';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import express from 'express';
+import path from 'path';
 
 dotenv.config();
-import * as homeController from './controllers/homeController';
+
 import * as ctaBusController from './controllers/ctaBusController';
 import * as ctaTrainController from './controllers/ctaTrainController';
-import * as weatherController from './controllers/weatherController';
 import * as eventsController from './controllers/eventsController';
+import * as homeController from './controllers/homeController';
 import * as messagesController from './controllers/messagesController';
+import * as weatherController from './controllers/weatherController';
 
 const app = express();
 
