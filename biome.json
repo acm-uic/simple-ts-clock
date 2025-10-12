@@ -24,7 +24,6 @@
       "semicolons": "always",
       "arrowParentheses": "always",
       "bracketSameLine": false,
-      "quoteStyle": "single",
       "attributePosition": "auto",
       "bracketSpacing": true
     }
