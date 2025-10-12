@@ -1,0 +1,13 @@
+# This doesn't quite do the same thing that happens on ACMCLOCK, because I don't think Github will host a NixOS VM for us.
+# Still, it's better than nothing.
+name: Nix CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@v20
+      - run: nix build
