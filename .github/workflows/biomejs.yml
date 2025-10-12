@@ -14,7 +14,9 @@ jobs:
           persist-credentials: false
       - name: Setup Biome
         uses: biomejs/setup-biome@v2
-        # TODO: Check for all issues, not just changed files, once we're handling them better (https://github.com/acm-uic/simple-ts-clock/issues/34).
+        # TODO: Check for warnings as well once I've configured biome more.
         # (That is, switch to `biome ci .`)uses: biomejs/setup-biome@v2
-      - name: Run Biome
-        run: biome ci --changed .
+      - name: Run Biome Format
+        run: biome format .
+      - name: Run Biome Lint
+        run: biome lint --diagnostic-level=error
