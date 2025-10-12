@@ -44,9 +44,7 @@
         "express": "^4.21.2",
         "googleapis": "^144.0.0",
         "path": "^0.12.7",
-        "pug": "^3.0.3",
-        "qrcode": "^1.5.4",
-        "sharp": "^0.34.4"
+        "pug": "^3.0.3"
     },
     "devDependencies": {
         "@types/apicache": "^1.6.7",
@@ -69,8 +67,9 @@
         "node-fetch": "^2.7.0",
         "nodemon": "^3.1.9",
         "prettier": "^3.5.0",
+        "qrcode": "^1.5.4",
         "rimraf": "^6.0.1",
-        "sass-loader": "^16.0.4",
+        "sharp": "^0.34.4",
         "style-loader": "^4.0.0",
         "ts-loader": "^9.5.2",
         "ts-node": "^10.9.2",
