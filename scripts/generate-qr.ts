@@ -1,17 +1,17 @@
 // samuel-skean: This was copied and pasted from ChatGPT, with minimal modifications. I have audited it, but this is also the first node code I've written.
 
-import { mkdirSync, rmSync } from 'node:fs';
-import { resolve } from 'path';
-import QRCode from 'qrcode';
-import sharp from 'sharp';
-import { qrCodeUrls } from '../src/qrCodeUrls';
+import { mkdirSync, rmSync } from "node:fs";
+import { resolve } from "path";
+import QRCode from "qrcode";
+import sharp from "sharp";
+import { qrCodeUrls } from "../src/qrCodeUrls";
 
 async function generate() {
-  const qrCodeDirectoryPath = resolve(__dirname, '../dist/public/qr/');
+  const qrCodeDirectoryPath = resolve(__dirname, "../dist/public/qr/");
   rmSync(qrCodeDirectoryPath, { recursive: true, force: true });
   mkdirSync(qrCodeDirectoryPath);
 
-  const discordLogoFile = resolve(__dirname, '../assets/discord-icon-svgrepo-com.svg');
+  const discordLogoFile = resolve(__dirname, "../assets/discord-icon-svgrepo-com.svg");
   const discordLogo = sharp(discordLogoFile);
   const { width: discordLogoWidth, height: discordLogoHeight } = await discordLogo.metadata();
   console.log(discordLogoHeight);
@@ -19,12 +19,12 @@ async function generate() {
   for (const [name, url] of Object.entries(qrCodeUrls)) {
     // TODONOW(samuel-skean): Remove all intermediate file steps!
     const qrCodeFile = resolve(__dirname, `../dist/public/qr/${name}.png`);
-    if (name === 'appRepo') {
-      await QRCode.toFile(qrCodeFile, url, { type: 'png', errorCorrectionLevel: 'H' });
+    if (name === "appRepo") {
+      await QRCode.toFile(qrCodeFile, url, { type: "png", errorCorrectionLevel: "H" });
       console.log(`✅ App Repo QR code generated: ${qrCodeFile}`);
       continue;
     }
-    const qrCode = sharp(await QRCode.toBuffer(url, { type: 'png', errorCorrectionLevel: 'H' }));
+    const qrCode = sharp(await QRCode.toBuffer(url, { type: "png", errorCorrectionLevel: "H" }));
     const { width: originalQrCodeWidth, height: originalQrCodeHeight } = await qrCode.metadata();
 
     // For who knows what reason, the "qrcode" library generates images where each "QR code pixel" is 4 x 4 pixels of the image. So, first we resize it down.
@@ -38,7 +38,7 @@ async function generate() {
               width: Math.ceil(qrCodeWidth / 4),
               height: Math.ceil(qrCodeHeight / 4),
               channels: 4,
-              background: 'white',
+              background: "white",
             },
           },
         },
