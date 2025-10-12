@@ -6,7 +6,10 @@
   "bin": {
     "simple-ts-clock": "./dist/server.js"
   },
-  "files": ["./dist/*", "./views/*"],
+  "files": [
+    "./dist/*",
+    "./views/*"
+  ],
   "scripts": {
     "clean": "rimraf ./dist/",
     "build": "npm run build-ts && npm run build-webpack && npm run generate:qr ",
@@ -44,6 +47,7 @@
     "pug": "^3.0.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.2.5",
     "@types/apicache": "^1.6.7",
     "@types/body-parser": "^1.19.5",
     "@types/compression": "^1.7.5",
