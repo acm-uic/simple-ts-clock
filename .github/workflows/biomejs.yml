@@ -13,6 +13,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup Biome
+        uses: biomejs/setup-biome@v2
         # TODO: Check for warnings as well once I've configured biome more.
         # (That is, switch to `biome ci .`)uses: biomejs/setup-biome@v2
       - name: Run Biome Format
