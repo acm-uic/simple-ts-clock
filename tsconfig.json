@@ -4,6 +4,7 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "incremental": true,
+    "lib": ["ES2022", "DOM"],
     "target": "es6",
     "noImplicitAny": true,
     "moduleResolution": "node",
