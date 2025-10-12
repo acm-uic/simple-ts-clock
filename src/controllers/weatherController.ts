@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import getWeather from '../util/getWeather';
 
-export let weather = (req: Request, res: Response): void => {
+export const weather = (req: Request, res: Response): void => {
   getWeather(String(req.query.weatherLatLong))
     .then((result): void => {
       res.send(result);

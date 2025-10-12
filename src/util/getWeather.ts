@@ -17,8 +17,8 @@ async function getWeather(weatherLatLong: string): Promise<{}> {
 
     const url = `https://api.pirateweather.net/forecast/${process.env.DARK_SKY_API_KEY}/${weatherLatLong}?exclude=minutely,hourly,daily,alerts,flags&units=si`;
 
-    let res = await fetch(url);
-    let data = await res.json();
+    const res = await fetch(url);
+    const data = await res.json();
 
     lastResponse = data;
 

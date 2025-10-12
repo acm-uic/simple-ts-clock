@@ -1,8 +1,8 @@
 import { getData } from './getData';
 import './main.css';
 
-const timeElement = document.getElementById('time');
-const dateElement = document.getElementById('date');
+const timeElement = document.getElementById('time')!;
+const dateElement = document.getElementById('date')!;
 const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const months = [
   'January',
@@ -46,8 +46,8 @@ function updateTime(): void {
 const switcherElements = document.querySelectorAll<HTMLDivElement>('#switcher > div');
 let counter = 0;
 function switcher(): void {
-  if (counter == switcherElements.length) counter = 0;
-  let previous = counter == 0 ? switcherElements.length - 1 : counter - 1;
+  if (counter === switcherElements.length) counter = 0;
+  const previous = counter === 0 ? switcherElements.length - 1 : counter - 1;
   switcherElements[previous].style.left = '-1500px';
   switcherElements[counter].style.left = '0px';
   counter++;
@@ -59,19 +59,20 @@ window.onload = (): void => {
   setInterval(updateTime, 5000);
 
   switch (mode) {
+    // biome-ignore lint/suspicious/noFallthroughSwitchClause: Hey man, the logic makes sense.
     case 'demo':
-      for (let key in demoData) {
+      for (const key in demoData) {
         let element = document.getElementById(`${key}`);
         if (!element) {
           const div = document.createElement('div');
           div.setAttribute('id', key);
-          document.querySelector('#switcher').appendChild(div);
-          element = document.getElementById(`${key}`);
+          document.querySelector('#switcher')!.appendChild(div);
+          element = document.getElementById(`${key}`)!;
         }
         element.innerHTML = demoData[key];
       }
     case 'offline':
-      document.getElementById(`${mode}Mode`).style.display = 'block';
+      document.getElementById(`${mode}Mode`)!.style.display = 'block';
       break;
     default:
       getData();

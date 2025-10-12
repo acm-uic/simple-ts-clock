@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import getMessages from '../util/getMessages';
 
-export let messages = (req: Request, res: Response): void => {
+export const messages = (req: Request, res: Response): void => {
   getMessages()
     .then((result): void => {
       res.send(result);

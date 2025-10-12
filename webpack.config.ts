@@ -1,5 +1,5 @@
 import path from 'path';
-import webpack from 'webpack';
+import type webpack from 'webpack';
 import 'eslint-webpack-plugin';
 import ESLintWebpackPlugin from 'eslint-webpack-plugin';
 

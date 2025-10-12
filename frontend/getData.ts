@@ -113,13 +113,13 @@ export interface Config {
 
 export function clearData(elementSelector?: string): void {
   if (!elementSelector) {
-    document.getElementById('bus').innerHTML = '';
-    document.getElementById('train').innerHTML = '';
-    document.getElementById('weather').innerHTML = '';
-    document.getElementById('events').innerHTML = '';
-    document.getElementById('messages').innerHTML = '';
+    document.getElementById('bus')!.innerHTML = '';
+    document.getElementById('train')!.innerHTML = '';
+    document.getElementById('weather')!.innerHTML = '';
+    document.getElementById('events')!.innerHTML = '';
+    document.getElementById('messages')!.innerHTML = '';
   } else {
-    document.querySelector(elementSelector).innerHTML = '';
+    document.querySelector(elementSelector)!.innerHTML = '';
   }
 }
 
@@ -138,30 +138,30 @@ export function getData(): void {
     .then((res): Promise<CtaBusPredictions> => res.json())
     .then((result): void => {
       const timeNow = new Date();
-      if (result['bustime-response'].hasOwnProperty('prd')) {
-        for (let i = 0; i < result['bustime-response'].prd.length; i++) {
-          const timeFromApi = result['bustime-response'].prd[i].prdtm;
+      if (Object.hasOwn(result['bustime-response'], 'prd')) {
+        for (let i = 0; i < result['bustime-response'].prd!.length; i++) {
+          const timeFromApi = result['bustime-response'].prd![i].prdtm;
           const prdTime = new Date(
             timeFromApi.slice(0, 4) + '/' + timeFromApi.slice(4, 6) + '/' + timeFromApi.slice(6, 16),
           );
           const eta = Math.floor(Math.abs(prdTime.valueOf() - timeNow.valueOf()) / 1000 / 60);
-          document.getElementById('bus').innerHTML +=
+          document.getElementById('bus')!.innerHTML +=
             `<li class='busItem'><span class='route icon'>${result['bustime-response'].prd[i].rt}</span><span class='eta'>${eta}m</span><span class='direction'>${result['bustime-response'].prd[i].rtdir}</span></li>`;
         }
-        result['bustime-response'].prd.forEach((ele): void => {
+        result['bustime-response'].prd!.forEach((ele): void => {
           const timeFromApi = ele.prdtm;
           const prdTime = new Date(
             timeFromApi.slice(0, 4) + '/' + timeFromApi.slice(4, 6) + '/' + timeFromApi.slice(6, 16),
           );
           const eta = Math.floor(Math.abs(prdTime.valueOf() - timeNow.valueOf()) / 1000 / 60);
-          document.getElementById('bus').innerHTML +=
+          document.getElementById('bus')!.innerHTML +=
             `<li class='busItem'><span class='route icon'>${ele.rt}</span><span class='eta'>${eta}m</span><span class='direction'>${ele.rtdir}</span></li>`;
         });
       }
     });
 
   clearData('#train');
-  config.ctaTrainStations.split(',').forEach((ele): void => {
+  config.ctaTrainStations!.split(',').forEach((ele): void => {
     fetch(`${origin}/api/ctaTrain?train=${ele}`)
       .then((res): Promise<CtaTrainPredictions> => res.json())
       .then((result): void => {
@@ -170,7 +170,7 @@ export function getData(): void {
           const prdTime = new Date(result.ctatt.eta[j].arrT);
           const eta = Math.floor(Math.abs(prdTime.valueOf() - timeNow.valueOf()) / 1000 / 60);
           const routeColor = ctaRouteColors[result.ctatt.eta[j].rt];
-          document.getElementById('train').innerHTML +=
+          document.getElementById('train')!.innerHTML +=
             `<li class='trainItem'><i class='fa fa-train icon' style=background-color:${routeColor};></i><span class='eta' style=color:${routeColor};border-color:${routeColor};>${eta}m</span><span class='direction'>${result.ctatt.eta[j].destNm}</span></li>`;
         }
       });
@@ -183,7 +183,7 @@ export function getData(): void {
       const temp = result.currently.apparentTemperature;
       const tempF = Math.round((temp * 9) / 5 + 32);
       const tempC = Math.round(temp);
-      document.getElementById('weather').innerHTML =
+      document.getElementById('weather')!.innerHTML =
         `<p>${result.currently.summary}</p><p>${tempF} &#176;F | ${tempC} &#176;C</p>`;
     });
 }

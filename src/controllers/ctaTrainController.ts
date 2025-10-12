@@ -1,7 +1,7 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import getCtaTrain from '../util/getCtaTrain';
 
-export let ctaTrain = (req: Request, res: Response): void => {
+export const ctaTrain = (req: Request, res: Response): void => {
   getCtaTrain(String(req.query.train))
     .then((result): void => {
       res.send(result);

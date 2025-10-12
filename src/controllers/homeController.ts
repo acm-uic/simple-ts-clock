@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { qrCodeUrls } from '../qrCodeUrls';
 
 interface ExplictAnyIndex {
@@ -12,8 +12,8 @@ export const defaultConfig: ExplictAnyIndex = {
   eventCalendars: ['kc72g1ctfg8b88df34qqb62d1s@group.calendar.google.com'],
 };
 
-export let index = (req: Request, res: Response): void => {
-  if (req.query.config != '') {
+export const index = (req: Request, res: Response): void => {
+  if (req.query.config !== '') {
     res.redirect(
       '/config/?' +
         Object.keys(defaultConfig)
@@ -25,13 +25,13 @@ export let index = (req: Request, res: Response): void => {
   }
 };
 
-export let config = (req: Request, res: Response): void => {
+export const config = (req: Request, res: Response): void => {
   res.locals.qrCodeUrls = qrCodeUrls;
   res.render('home', {
     title: 'Home',
   });
 };
 
-export let offline = config;
+export const offline = config;
 
-export let demo = config;
+export const demo = config;

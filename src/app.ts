@@ -16,7 +16,7 @@ import * as messagesController from './controllers/messagesController';
 
 const app = express();
 
-let cache = apicache.middleware;
+const cache = apicache.middleware;
 
 app.set('port', process.env.PORT || 8080);
 app.set('views', path.join(__dirname, '../views'));

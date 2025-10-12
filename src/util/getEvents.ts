@@ -1,7 +1,7 @@
 import fs from 'fs';
 import readline from 'readline';
 import { google } from 'googleapis';
-import { OAuth2Client } from 'googleapis-common';
+import type { OAuth2Client } from 'googleapis-common';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -41,11 +41,11 @@ function getAccessToken(oAuth2Client: OAuth2Client, callback: any): void {
   rl.question('Enter the code from that page here: ', (code): void => {
     rl.close();
     oAuth2Client.getToken(code, (err, token): void => {
-      if (err) return console.error('Error retrieving access token', err);
+      if (err) console.error('Error retrieving access token', err);
       oAuth2Client.setCredentials(token);
       // Store the token to disk for later program executions
       fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err): void => {
-        if (err) return console.error(err);
+        if (err) console.error(err);
         console.log('Token stored to', TOKEN_PATH);
       });
       callback(oAuth2Client);
@@ -68,11 +68,11 @@ function getEvents(auth: OAuth2Client): void {
       orderBy: 'startTime',
     },
     (err, res): void => {
-      if (err) return console.log('The API returned an error: ' + err);
+      if (err) console.log('The API returned an error: ' + err);
       const events = res.data.items;
       if (events.length) {
         console.log(`Upcoming 10 events for ${res.data.summary}:`);
-        events.map((event, i): void => {
+        events.forEach((event, i): void => {
           const name = event.summary;
           const location = event.location;
           const start = event.start.dateTime || event.start.date;
@@ -106,15 +106,15 @@ function authorize(credentials: Credentials, callback: any): any {
 
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, (err, token): void => {
-    if (err) return getAccessToken(oAuth2Client, callback);
+    if (err) getAccessToken(oAuth2Client, callback);
     oAuth2Client.setCredentials(JSON.parse(token.toString()));
-    return callback(oAuth2Client);
+    callback(oAuth2Client);
   });
 }
 
 // Load client secrets from a local file.
 fs.readFile('credentials.json', (err: NodeJS.ErrnoException, content: Buffer): void => {
-  if (err) return console.log('Error loading client secret file:', err);
+  if (err) console.log('Error loading client secret file:', err);
   // Authorize a client with credentials, then call the Google Calendar API.
   authorize(JSON.parse(content.toString()), getEvents);
 });
