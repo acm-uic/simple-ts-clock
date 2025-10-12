@@ -18,7 +18,7 @@ export const index = (req: Request, res: Response): void => {
       '/config/?' +
         Object.keys(defaultConfig)
           .map((k): string => {
-            return encodeURIComponent(k) + '=' + encodeURIComponent(defaultConfig[k]);
+            return `${encodeURIComponent(k)}=${encodeURIComponent(defaultConfig[k])}`;
           })
           .join('&'),
     );

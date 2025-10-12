@@ -142,7 +142,7 @@ export function getData(): void {
         for (let i = 0; i < result['bustime-response'].prd!.length; i++) {
           const timeFromApi = result['bustime-response'].prd![i].prdtm;
           const prdTime = new Date(
-            timeFromApi.slice(0, 4) + '/' + timeFromApi.slice(4, 6) + '/' + timeFromApi.slice(6, 16),
+            `${timeFromApi.slice(0, 4)}/${timeFromApi.slice(4, 6)}/${timeFromApi.slice(6, 16)}`,
           );
           const eta = Math.floor(Math.abs(prdTime.valueOf() - timeNow.valueOf()) / 1000 / 60);
           document.getElementById('bus')!.innerHTML +=
@@ -151,7 +151,7 @@ export function getData(): void {
         result['bustime-response'].prd!.forEach((ele): void => {
           const timeFromApi = ele.prdtm;
           const prdTime = new Date(
-            timeFromApi.slice(0, 4) + '/' + timeFromApi.slice(4, 6) + '/' + timeFromApi.slice(6, 16),
+            `${timeFromApi.slice(0, 4)}/${timeFromApi.slice(4, 6)}/${timeFromApi.slice(6, 16)}`,
           );
           const eta = Math.floor(Math.abs(prdTime.valueOf() - timeNow.valueOf()) / 1000 / 60);
           document.getElementById('bus')!.innerHTML +=

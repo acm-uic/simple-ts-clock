@@ -22,7 +22,7 @@ const httpOptions: https.RequestOptions =
 const server = process.env.HTTPS === 'true' ? https.createServer(httpOptions, app) : http.createServer(app);
 
 server.listen(port, (): void => {
-  console.log('Server started on port ' + port);
+  console.log(`Server started on port ${port}`);
 });
 
 export default server;
