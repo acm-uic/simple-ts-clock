@@ -1,5 +1,5 @@
 import { getData } from "./getData";
-import "./main.scss";
+import "./main.css";
 
 const timeElement = document.getElementById("time");
 const dateElement = document.getElementById("date");

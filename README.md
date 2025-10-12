@@ -7,7 +7,7 @@ A simple, maybe not so simple clock replacement for the office of ACM@UIC.
 * Time and Date
 * CTA Bus and Train Arrival Times
 * Weather from DarkSky
-* QR Codes for ACM and LUG Discords, and a QR code for the app repository
+* QR Codes for ACM and LUG Discords
 
 # Building and deployment
 
@@ -30,8 +30,9 @@ can be run as follows:
 2. Navigate to the repository directory.
 3. Create a `.env` file based on `.env.example`.
 4. Optionally modify the values (not the keys) of `src/qrCodeUrls.ts` to point to up-to-date URLs for the Discord and the repository for this project, if they've changed. Please commit those changes.
-4. Run `npm install` to install dependencies.
+4. Run `npm install` to install dependencies. (See [CONTRIBUTING.md](CONTRIBUTING.md) for detail about how to install dependencies when changing the set of dependencies.)
 5. Run `npm run build` to make `npm run start` work (I haven't investigated why this is necessary).
+5. Run `npm run start`.
 
 ### How to use
 
