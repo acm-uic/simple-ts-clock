@@ -1,80 +1,78 @@
 {
-    "name": "simple-js-clock",
-    "version": "3.0.0",
-    "description": "",
-    "main": "dist/server.js",
-    "bin": {
-        "simple-ts-clock": "./dist/server.js"
-    },
-    "files": [
-        "./dist/*",
-        "./views/*"
-    ],
-    "scripts": {
-        "clean": "rimraf ./dist/",
-        "build": "npm run build-ts && npm run build-webpack && npm run generate:qr ",
-        "generate:qr": "ts-node ./scripts/generate-qr.ts",
-        "build-ts": "tsc",
-        "watch-ts": "tsc -w",
-        "build-webpack": "webpack-cli --mode production",
-        "watch-webpack": "webpack-cli -w --mode production",
-        "watch-node": "nodemon ./dist/server.js",
-        "start": "node ./dist/server.js",
-        "watch-server": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
-        "watch": "concurrently -k -p \"[{name}]\" -n \"Webpack,TypeScript,Node\" -c \"magenta.bold,cyan.bold,green.bold\" \"npm run watch-webpack\" \"npm run watch-ts\" \"npm run watch-node\""
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/bmiddha/simple-js-clock.git"
-    },
-    "author": "Bharat Middha",
-    "license": "GPL-3.0",
-    "bugs": {
-        "url": "https://github.com/bmiddha/simple-js-clock/issues"
-    },
-    "homepage": "https://github.com/bmiddha/simple-js-clock#readme",
-    "dependencies": {
-        "@fortawesome/fontawesome-free": "^6.7.2",
-        "@types/qrcode": "^1.5.5",
-        "apicache": "^1.6.3",
-        "body-parser": "^1.20.3",
-        "compression": "^1.8.0",
-        "cors": "^2.8.5",
-        "dotenv": "^16.4.7",
-        "express": "^4.21.2",
-        "googleapis": "^144.0.0",
-        "path": "^0.12.7",
-        "pug": "^3.0.3"
-    },
-    "devDependencies": {
-        "@types/apicache": "^1.6.7",
-        "@types/body-parser": "^1.19.5",
-        "@types/compression": "^1.7.5",
-        "@types/cors": "^2.8.17",
-        "@types/express": "^5.0.0",
-        "@types/node": "^22.13.1",
-        "@types/node-fetch": "^2.6.12",
-        "@types/webpack": "^5.28.5",
-        "@typescript-eslint/eslint-plugin": "^8.24.0",
-        "@typescript-eslint/parser": "^8.24.0",
-        "concurrently": "^9.1.2",
-        "css-loader": "^7.1.2",
-        "eslint": "^9.20.1",
-        "eslint-config-prettier": "^10.0.1",
-        "eslint-plugin-prettier": "^5.2.3",
-        "eslint-webpack-plugin": "^4.2.0",
-        "file-loader": "^6.2.0",
-        "node-fetch": "^2.7.0",
-        "nodemon": "^3.1.9",
-        "prettier": "^3.5.0",
-        "qrcode": "^1.5.4",
-        "rimraf": "^6.0.1",
-        "sharp": "^0.34.4",
-        "style-loader": "^4.0.0",
-        "ts-loader": "^9.5.2",
-        "ts-node": "^10.9.2",
-        "typescript": "^5.7.3",
-        "webpack": "^5.97.1",
-        "webpack-cli": "^6.0.1"
-    }
+  "name": "simple-js-clock",
+  "version": "3.0.0",
+  "description": "",
+  "main": "dist/server.js",
+  "bin": {
+    "simple-ts-clock": "./dist/server.js"
+  },
+  "files": ["./dist/*", "./views/*"],
+  "scripts": {
+    "clean": "rimraf ./dist/",
+    "build": "npm run build-ts && npm run build-webpack && npm run generate:qr ",
+    "generate:qr": "ts-node ./scripts/generate-qr.ts",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w",
+    "build-webpack": "webpack-cli --mode production",
+    "watch-webpack": "webpack-cli -w --mode production",
+    "watch-node": "nodemon ./dist/server.js",
+    "start": "node ./dist/server.js",
+    "watch-server": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
+    "watch": "concurrently -k -p \"[{name}]\" -n \"Webpack,TypeScript,Node\" -c \"magenta.bold,cyan.bold,green.bold\" \"npm run watch-webpack\" \"npm run watch-ts\" \"npm run watch-node\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bmiddha/simple-js-clock.git"
+  },
+  "author": "Bharat Middha",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/bmiddha/simple-js-clock/issues"
+  },
+  "homepage": "https://github.com/bmiddha/simple-js-clock#readme",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "@types/qrcode": "^1.5.5",
+    "apicache": "^1.6.3",
+    "body-parser": "^1.20.3",
+    "compression": "^1.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "googleapis": "^144.0.0",
+    "path": "^0.12.7",
+    "pug": "^3.0.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.2.5",
+    "@types/apicache": "^1.6.7",
+    "@types/body-parser": "^1.19.5",
+    "@types/compression": "^1.7.5",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.1",
+    "@types/node-fetch": "^2.6.12",
+    "@types/webpack": "^5.28.5",
+    "@typescript-eslint/eslint-plugin": "^8.24.0",
+    "@typescript-eslint/parser": "^8.24.0",
+    "concurrently": "^9.1.2",
+    "css-loader": "^7.1.2",
+    "eslint": "^9.20.1",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-webpack-plugin": "^4.2.0",
+    "file-loader": "^6.2.0",
+    "node-fetch": "^2.7.0",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.5.0",
+    "qrcode": "^1.5.4",
+    "rimraf": "^6.0.1",
+    "sharp": "^0.34.4",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1"
+  }
 }

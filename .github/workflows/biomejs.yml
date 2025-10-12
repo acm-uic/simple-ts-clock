@@ -1,0 +1,22 @@
+name: Biome JS Code Quality Checks
+
+on: [push, pull_request]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        # TODO: Check for warnings as well once I've configured biome more (See https://github.com/acm-uic/simple-ts-clock/issues/34).
+        # (That is, switch to `biome ci .`)
+      - name: Run Biome Format
+        run: biome format .
+      - name: Run Biome Lint
+        run: biome lint --diagnostic-level=error
