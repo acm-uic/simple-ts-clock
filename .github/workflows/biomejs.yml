@@ -13,8 +13,9 @@ jobs:
         with:
           persist-credentials: false
       - name: Setup Biome
-        uses: biomejs/setup-biome@v2
-      - name: Run Biome
         # TODO: Check for warnings as well once I've configured biome more.
-        # (That is, switch to `biome ci .`)
-        run: biome check --diagnostic-level=error .
+        # (That is, switch to `biome ci .`)uses: biomejs/setup-biome@v2
+      - name: Run Biome Format
+        run: biome format .
+      - name: Run Biome Lint
+        run: biome lint --diagnostic-level=error
