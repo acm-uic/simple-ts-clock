@@ -17,13 +17,7 @@ async function generate() {
   console.log(discordLogoHeight);
 
   for (const [name, url] of Object.entries(qrCodeUrls)) {
-    // TODONOW(samuel-skean): Remove all intermediate file steps!
     const qrCodeFile = resolve(__dirname, `../dist/public/qr/${name}.png`);
-    if (name === "appRepo") {
-      await QRCode.toFile(qrCodeFile, url, { type: "png", errorCorrectionLevel: "H" });
-      console.log(`✅ App Repo QR code generated: ${qrCodeFile}`);
-      continue;
-    }
     const qrCode = sharp(await QRCode.toBuffer(url, { type: "png", errorCorrectionLevel: "H" }));
     const { width: originalQrCodeWidth, height: originalQrCodeHeight } = await qrCode.metadata();
 
@@ -53,7 +47,7 @@ async function generate() {
       ])
       .png()
       .toFile(qrCodeFile);
-    console.log(`✅ Discord QR code generated: ${qrCodeFile}`);
+    console.log(`✅ QR code generated: ${qrCodeFile}`);
   }
 }
 
