@@ -27,7 +27,7 @@ app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, "public"), { maxAge: 0 }));
+app.use(express.static(path.join("dist", "public"), { maxAge: 0 }));
 app.use("/api/*", cache("1 minute"));
 
 app.get("/", homeController.index);
