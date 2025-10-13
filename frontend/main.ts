@@ -1,4 +1,5 @@
 import { getData } from "./getData";
+import "@fontsource-variable/montserrat";
 import "./main.css";
 
 const timeElement = document.getElementById("time")!;
