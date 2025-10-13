@@ -10,5 +10,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/nix-installer-action@v20
-      - run: nix profile install nixpkgs#nodejs_22
       - run: nix build
