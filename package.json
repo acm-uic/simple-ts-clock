@@ -6,11 +6,14 @@
   "bin": {
     "simple-ts-clock": "./dist/server.js"
   },
-  "files": ["./dist/*", "./views/*"],
+  "files": [
+    "./dist/*",
+    "./views/*"
+  ],
   "scripts": {
     "clean": "rimraf ./dist/",
-    "build": "npm run build-ts && npx vite build && npm run generate:qr",
-    "dev": "npm run build && npm run start",
+    "build": "npm run build-ts && vite build && npm run generate:qr",
+    "dev": "vite build && npm run generate:qr && ts-node ./src/server.ts",
     "generate:qr": "ts-node ./scripts/generate-qr.ts",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
