@@ -30,7 +30,6 @@
   "homepage": "https://github.com/bmiddha/simple-js-clock#readme",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",
-    "@types/qrcode": "^1.5.5",
     "apicache": "^1.6.3",
     "body-parser": "^1.20.3",
     "compression": "^1.8.0",
@@ -56,6 +55,7 @@
     "node-fetch": "^2.7.0",
     "nodemon": "^3.1.9",
     "qrcode": "^1.5.4",
+    "@types/qrcode": "^1.5.5",
     "rimraf": "^6.0.1",
     "sharp": "^0.34.4",
     "style-loader": "^4.0.0",
