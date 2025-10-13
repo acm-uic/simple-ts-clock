@@ -6,10 +6,7 @@
   "bin": {
     "simple-ts-clock": "./dist/server.js"
   },
-  "files": [
-    "./dist/*",
-    "./views/*"
-  ],
+  "files": ["./dist/*", "./views/*"],
   "scripts": {
     "clean": "rimraf ./dist/",
     "build": "npm run build-ts && vite build && npm run generate:qr",
