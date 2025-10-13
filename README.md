@@ -31,8 +31,7 @@ can be run as follows:
 3. Create a `.env` file based on `.env.example`.
 4. Optionally modify the values (not the keys) of `src/qrCodeUrls.ts` to point to up-to-date URLs for the Discord and the repository for this project, if they've changed. Please commit those changes.
 4. Run `npm install` to install dependencies. (See [CONTRIBUTING.md](CONTRIBUTING.md) for detail about how to install dependencies when changing the set of dependencies.)
-5. Run `npm run build` to make `npm run start` work (I haven't investigated why this is necessary).
-5. Run `npm run start`.
+5. Run `npm run dev`.
 
 ### How to use
 
