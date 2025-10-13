@@ -6,7 +6,10 @@
   "bin": {
     "simple-ts-clock": "./dist/server.js"
   },
-  "files": ["./dist/*", "./views/*"],
+  "files": [
+    "./dist/*",
+    "./views/*"
+  ],
   "scripts": {
     "clean": "rimraf ./dist/",
     "build": "npm run build-ts && npm run build-webpack && npm run generate:qr ",
@@ -53,18 +56,12 @@
     "@types/node": "^22.13.1",
     "@types/node-fetch": "^2.6.12",
     "@types/webpack": "^5.28.5",
-    "@typescript-eslint/eslint-plugin": "^8.24.0",
-    "@typescript-eslint/parser": "^8.24.0",
     "concurrently": "^9.1.2",
     "css-loader": "^7.1.2",
-    "eslint": "^9.20.1",
-    "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-prettier": "^5.2.3",
     "eslint-webpack-plugin": "^4.2.0",
     "file-loader": "^6.2.0",
     "node-fetch": "^2.7.0",
     "nodemon": "^3.1.9",
-    "prettier": "^3.5.0",
     "qrcode": "^1.5.4",
     "rimraf": "^6.0.1",
     "sharp": "^0.34.4",
