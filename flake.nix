@@ -39,7 +39,7 @@
         name = "ACMclock DevShell";
 
         packages = with pkgs; [
-          nodejs
+          nodejs_22
           typescript
           typescript-language-server
         ];
