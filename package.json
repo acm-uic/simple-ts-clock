@@ -11,7 +11,7 @@
     "clean": "rimraf ./dist/",
     "build": "npm run build-ts && vite build && npm run generate:qr",
     "dev": "vite build && npm run generate:qr && ts-node ./src/server.ts",
-    "generate:qr": "ts-node ./scripts/generate-qr.ts",
+    "generate:qr": "make ./dist/public/qr/.qr-code-fake-target",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "watch-node": "nodemon ./dist/server.js",
