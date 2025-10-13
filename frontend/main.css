@@ -110,7 +110,7 @@ ul {
 
 /* Hide scrollbar */
 body::-webkit-scrollbar {
-  width: 0;
+  width: 0 !important;
 }
 body {
   overflow: -moz-scrollbars-none;
@@ -135,11 +135,9 @@ body {
   max-height: 100%;
   border: 1px solid #000000;
   display: grid;
-  grid-template-areas: "time time time weather weather" "date date date date date" "qr-code-area qr-code-area qr-code-area qr-code-area qr-code-area" "switcher switcher switcher switcher switcher" "footer footer footer footer footer";
+  grid-template-areas: "time time time weather weather" "date date date date date" "acm-discord-qr-code-label acm-discord-qr-code lug-discord-qr-code-label lug-discord-qr-code messages" "switcher switcher switcher switcher switcher" "footer footer footer footer footer";
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   grid-template-rows: 0.6fr 0.2fr 0.9fr 4fr 0.18fr;
-  padding: 25px;
-
   #time {
     grid-area: time;
   }
@@ -153,31 +151,25 @@ body {
     grid-area: switcher;
     overflow: hidden;
   }
-  #qr-code-area {
-    grid-area: "qr-code-area";
-    /* TODO: Fix this ugliness. */
-    width: calc(1080px - 25px - 25px);
-
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-
-    #acm-discord-qr-code-label {
-      place-self: center;
-      line-height: inherit;
-      text-align: center;
-    }
-    #acm-discord-qr-code {
-      place-self: center;
-    }
-    #lug-discord-qr-code-label {
-      place-self: center;
-      line-height: inherit;
-      text-align: center;
-    }
-    #lug-discord-qr-code {
-      place-self: center;
-    }
+  #acm-discord-qr-code-label {
+    grid-area: acm-discord-qr-code-label;
+    place-self: center;
+    line-height: inherit;
+    text-align: center;
+  }
+  #acm-discord-qr-code {
+    grid-area: acm-discord-qr-code;
+    place-self: center;
+  }
+  #lug-discord-qr-code-label {
+    grid-area: lug-discord-qr-code-label;
+    place-self: center;
+    line-height: inherit;
+    text-align: center;
+  }
+  #lug-discord-qr-code {
+    grid-area: lug-discord-qr-code;
+    place-self: center;
   }
   #footer {
     grid-area: footer;
@@ -186,7 +178,7 @@ body {
 
 /* Switcher */
 #switcher {
-  margin-bottom: 100px;
+  margin: 0px 0px 100px 0px;
   position: relative;
   & > div {
     width: 100%;
@@ -194,6 +186,10 @@ body {
     transition: all ease-in-out 1s;
     left: -1500px;
   }
+}
+
+.wrapper {
+  padding: 25px;
 }
 
 #time {
@@ -328,6 +324,10 @@ body {
 img.qrCode {
   width: 200px;
   height: 200px;
+}
+
+#app-repo-qr-code {
+  display: none;
 }
 
 #footer {
