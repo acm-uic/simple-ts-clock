@@ -1,9 +1,9 @@
-name: Biome JS Code Quality Checks
+name: Biome JS Lints
 
 on: [push, pull_request]
 
 jobs:
-  quality:
+  lint:
     runs-on: ubuntu-latest
     permissions:
       contents: read
