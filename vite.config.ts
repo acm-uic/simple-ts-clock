@@ -5,6 +5,7 @@ export default defineConfig({
   root: "frontend/",
   build: {
     outDir: "../dist/public/",
+    emptyOutDir: true,
     rollupOptions: {
       input: resolve(import.meta.dirname, "frontend/main.ts"),
       output: {
