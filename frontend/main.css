@@ -173,10 +173,10 @@ body {
 
 /* Switcher */
 #switcher {
-  margin: 0px 0px 100px 0px;
   position: relative;
   & > div {
     width: 100%;
+    height: 100%;
     position: absolute;
     transition: all ease-in-out 1s;
     left: -1500px;
