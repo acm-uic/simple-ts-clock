@@ -183,8 +183,15 @@ body {
   }
 }
 
+#sky {
+  grid-row: 1 / 4;
+  grid-column: 1 / -1;
+  z-index: -1;
+}
+
 .wrapper {
   padding: 25px;
+  isolation: isolate;
 }
 
 .wrapper > * {
