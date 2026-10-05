@@ -1,3 +1,4 @@
+import type { Weather } from "../src/util/weatherTypes";
 interface StringIndexes {
   [key: string]: string;
 }
@@ -76,34 +77,6 @@ interface CtaTrainPredictions {
   };
 }
 
-interface WeatherForecast {
-  latitude: number;
-  longitude: number;
-  timezone: string;
-  currently: {
-    time: number;
-    summary: string;
-    icon: string;
-    nearestStormDistance: number;
-    nearestStormBearing: number;
-    precipIntensity: number;
-    precipProbability: number;
-    temperature: number;
-    apparentTemperature: number;
-    dewPoint: number;
-    humidity: number;
-    pressure: number;
-    windSpeed: number;
-    windGust: number;
-    windBearing: number;
-    cloudCover: number;
-    uvIndex: number;
-    visibility: number;
-    ozone: number;
-  };
-  offset: number;
-}
-
 export interface Config {
   ctaBusStops?: string[];
   ctaTrainStations?: string[];
@@ -172,14 +145,15 @@ export async function getData() {
     })();
   });
 
-  clearData("#weather");
   (async () => {
-    const res = await fetch(`${origin}/api/weather?weatherLatLong=${config.weatherLatLong}`);
-    const result = await res.json();
-    const temp = result.currently.apparentTemperature;
-    const tempF = Math.round((temp * 9) / 5 + 32);
-    const tempC = Math.round(temp);
-    document.getElementById("weather")!.innerHTML =
-      `<p>${result.currently.summary}</p><p>${tempF} &#176;F | ${tempC} &#176;C</p>`;
+    try {
+      const res = await fetch(`${origin}/api/weather?weatherLatLong=${config.weatherLatLong}`);
+      if (!res.ok) return; // keep whatever is on screen
+      const w: Weather = await res.json();
+      const html = `<p>${w.description}${w.source === "forecast" ? " (est.)" : ""}</p><p>${w.tempF} &#176;F | ${w.tempC} &#176;C</p>`;
+      document.getElementById("weather")!.innerHTML = html;
+    } catch (err) {
+      console.error("Weather update failed:", err);
+    }
   })();
 }
