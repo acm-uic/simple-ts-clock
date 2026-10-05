@@ -187,6 +187,11 @@ body {
   padding: 25px;
 }
 
+.wrapper > * {
+  min-height: 0;
+  overflow: hidden;
+}
+
 #time {
   font-size: 4.5em;
 }
@@ -211,6 +216,7 @@ body {
 
 #messages {
   display: none;
+  grid-area: messages;
 }
 
 #cta {
