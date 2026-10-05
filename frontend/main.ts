@@ -19,6 +19,11 @@ const months = [
   "November",
   "December",
 ];
+const timeFormat = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/Chicago",
+  hour: "2-digit",
+  minute: "2-digit",
+});
 
 interface StringIndexes {
   [key: string]: string;
@@ -35,12 +40,11 @@ const demoData: StringIndexes = {
 
 function updateTime(): void {
   const now = new Date();
-  const hour = now.getHours();
-  const min = now.getMinutes().toString().padStart(2, "0");
+  const nowFormat = timeFormat.formatToParts(now);
+  const hour = nowFormat.find((p) => p.type === "hour")?.value;
+  const min = nowFormat.find((p) => p.type === "minute")?.value;
   const date = now.getDate().toString().padStart(2, "0");
-  const hourstr = (hour > 12 ? hour - 12 : hour).toString().padStart(2, "0");
-
-  timeElement.innerHTML = `${hourstr}:${min}`;
+  timeElement.innerHTML = `${hour}:${min}`;
   dateElement.innerHTML = `${days[now.getDay()]} | ${months[now.getMonth()]} ${date}`;
 }
 
