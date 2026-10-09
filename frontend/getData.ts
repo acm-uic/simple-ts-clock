@@ -14,69 +14,6 @@ const ctaRouteColors: StringIndexes = {
   Purple: "#866ec7",
   Yellow: "#e4c666",
 };
-
-interface CtaBusPrediction {
-  tmstmp: string;
-  typ: string;
-  stpnm: string;
-  stpid: string;
-  vid: string;
-  dstp: number;
-  rt: string;
-  rtdd: string;
-  rtdir: string;
-  des: string;
-  prdtm: string;
-  tablockid: string;
-  tatripid: string;
-  dly: boolean;
-  prdctdn: string;
-  zone: string;
-}
-
-interface CtaBusError {
-  stpid: string;
-  msg: string;
-}
-
-interface CtaBusPredictions {
-  "bustime-response": {
-    prd?: CtaBusPrediction[];
-    error?: CtaBusError[];
-  };
-}
-
-interface CtaTrainPrediction {
-  staId: string;
-  stpId: string;
-  staNm: string;
-  stpDe: string;
-  rn: string;
-  rt: string;
-  destSt: string;
-  destNm: string;
-  trDr: string;
-  prdt: Date;
-  arrT: Date;
-  isApp: string;
-  isSch: string;
-  isDly: string;
-  isFlt: string;
-  flags: boolean;
-  lat: string;
-  lon: string;
-  heading: string;
-}
-
-interface CtaTrainPredictions {
-  ctatt: {
-    tmst: string;
-    errCd: string;
-    errNm: number;
-    eta: CtaTrainPrediction[];
-  };
-}
-
 export interface Config {
   ctaBusStops?: string[];
   ctaTrainStations?: string[];
