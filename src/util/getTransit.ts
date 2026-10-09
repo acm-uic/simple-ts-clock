@@ -41,12 +41,16 @@ export async function getTransit(busStops: string, trainStations: string): Promi
     return lists.flat();
   }, 1);
 
-  const [bus, train] = await Promise.allSettled([cachedBus(), cachedTrain()]);
-  if (bus.status === "rejected" && train.status === "rejected") throw new Error("CTA bus and train requests both failed");
+  const [bus, train] = await Promise.allSettled([
+    busStops ? cachedBus() : Promise.resolve([]),
+    trainStations ? cachedTrain() : Promise.resolve([]),
+  ]);
+  if (bus.status === "rejected" && train.status === "rejected")
+    throw new Error("CTA bus and train requests both failed");
   if (bus.status === "rejected") console.error("CTA bus request failed:", bus.reason);
   if (train.status === "rejected") console.error("CTA train request failed:", train.reason);
 
-  const busArrivals = (bus.status === "fulfilled") ? bus.value : [];
-  const trainArrivals = (train.status === "fulfilled") ? train.value : [];
+  const busArrivals = bus.status === "fulfilled" ? bus.value : [];
+  const trainArrivals = train.status === "fulfilled" ? train.value : [];
   return groupAndLimit([...busArrivals, ...trainArrivals]);
 }

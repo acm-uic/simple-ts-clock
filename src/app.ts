@@ -8,12 +8,11 @@ import path from "path";
 
 dotenv.config();
 
-import * as ctaBusController from "./controllers/ctaBusController";
-import * as ctaTrainController from "./controllers/ctaTrainController";
 import * as eventsController from "./controllers/eventsController";
 import * as homeController from "./controllers/homeController";
 import * as messagesController from "./controllers/messagesController";
 import * as weatherController from "./controllers/weatherController";
+import * as transitController from "./controllers/transitController";
 
 const app = express();
 
@@ -34,8 +33,7 @@ app.get("/", homeController.index);
 app.get("/config", homeController.config);
 app.get("/offline", homeController.offline);
 app.get("/demo", homeController.demo);
-app.get("/api/ctaBus", ctaBusController.ctaBus);
-app.get("/api/ctaTrain", ctaTrainController.ctaTrain);
+app.get("/api/transit", transitController.transit);
 app.get("/api/weather", weatherController.weather);
 app.get("/api/events", eventsController.events);
 app.get("/api/messages", messagesController.messages);
