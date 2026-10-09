@@ -1,3 +1,6 @@
+import { cached } from "./cached";
+import getCtaBus from "./getCtaBus";
+import getCtaTrain from "./getCtaTrain";
 import type { Arrival, ArrivalGroup } from "./transitTypes";
 
 const PER_GROUP = 2;
@@ -26,4 +29,24 @@ export function groupAndLimit(arrivals: Arrival[]): ArrivalGroup[] {
     if (group.arrivals.length < PER_GROUP) group.arrivals.push(a);
   });
   return [...groups.values()];
+}
+
+let cachedBus: (() => Promise<Arrival[]>) | undefined;
+let cachedTrain: (() => Promise<Arrival[]>) | undefined;
+
+export async function getTransit(busStops: string, trainStations: string): Promise<ArrivalGroup[]> {
+  cachedBus ??= cached(() => getCtaBus(busStops), 1);
+  cachedTrain ??= cached(async () => {
+    const lists = await Promise.all(trainStations.split(",").map((id) => getCtaTrain(id)));
+    return lists.flat();
+  }, 1);
+
+  const [bus, train] = await Promise.allSettled([cachedBus(), cachedTrain()]);
+  if (bus.status === "rejected" && train.status === "rejected") throw new Error("CTA bus and train requests both failed");
+  if (bus.status === "rejected") console.error("CTA bus request failed:", bus.reason);
+  if (train.status === "rejected") console.error("CTA train request failed:", train.reason);
+
+  const busArrivals = (bus.status === "fulfilled") ? bus.value : [];
+  const trainArrivals = (train.status === "fulfilled") ? train.value : [];
+  return groupAndLimit([...busArrivals, ...trainArrivals]);
 }
