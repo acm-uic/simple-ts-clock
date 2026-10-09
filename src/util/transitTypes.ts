@@ -78,7 +78,7 @@ export interface CtaTrainPredictions {
   ctatt: {
     tmst: string;
     errCd: string;
-    errNm: number;
-    eta: CtaTrainPrediction[];
+    errNm: string | null;
+    eta?: CtaTrainPrediction[];
   };
 }

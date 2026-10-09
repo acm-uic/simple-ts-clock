@@ -1,17 +1,20 @@
 import dotenv from "dotenv";
-import type { CtaTrainPrediction, Arrival } from "./transitTypes";
+import type { CtaTrainPrediction, Arrival, CtaTrainPredictions } from "./transitTypes";
 
 dotenv.config();
 
-async function getCtaTrain(trainStation: string) {
+async function getCtaTrain(trainStation: string): Promise<Arrival[]> {
   const url =
     "https://lapi.transitchicago.com/api/1.0/ttarrivals.aspx?key=" +
     process.env.CTA_TRAIN_API_KEY +
     "&mapid=" +
     trainStation +
     "&max=10&outputType=JSON";
-  const res = await fetch(url);
-  return await res.json();
+  const res = await fetch(url, {signal: AbortSignal.timeout(10_000)});
+  if (!res.ok) throw new Error(`CTA Train Tracker HTTP ${res.status}`);
+  const data = (await res.json()) as CtaTrainPredictions;
+  if (data.ctatt.errCd !== "0") throw new Error(`CTA Train Tracker error ${data.ctatt.errCd}: ${data.ctatt.errNm}`);
+  return (data.ctatt.eta ?? []).map(trainToArrival);
 }
 
 export function trainToArrival(p: CtaTrainPrediction): Arrival {

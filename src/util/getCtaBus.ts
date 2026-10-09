@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import type { CtaBusPrediction, Arrival } from "./transitTypes";
+import type { CtaBusPrediction, CtaBusPredictions, Arrival } from "./transitTypes";
 
 dotenv.config();
 
@@ -9,15 +9,18 @@ const CROWDING = ["EMPTY", "HALF_EMPTY", "FULL"] as const;
 const CANCELED_DYN = [1, 16, 17, 18];
 const EXPRESSED_DYN = 4; // drop-off only, won't pick up
 
-async function getCtaBus(busStop: string) {
+async function getCtaBus(busStop: string): Promise<Arrival[]> {
   const url =
     "https://www.ctabustracker.com/bustime/api/v3/getpredictions?key=" +
     process.env.CTA_BUS_API_KEY +
     "&stpid=" +
     busStop +
     "&format=json";
-  const res = await fetch(url);
-  return await res.json();
+  const res = await fetch(url, {signal: AbortSignal.timeout(10_000)});
+  if (!res.ok) throw new Error(`CTA Bus Tracker HTTP ${res.status}`);
+  const data = (await res.json()) as CtaBusPredictions;
+  const prd = data["bustime-response"]?.prd ?? [];
+  return prd.map(busToArrival);
 }
 
 // "20261005 14:37" (Chicago local time) → milliseconds
