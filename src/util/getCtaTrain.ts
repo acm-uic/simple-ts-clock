@@ -10,7 +10,7 @@ async function getCtaTrain(trainStation: string): Promise<Arrival[]> {
     "&mapid=" +
     trainStation +
     "&max=10&outputType=JSON";
-  const res = await fetch(url, {signal: AbortSignal.timeout(10_000)});
+  const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
   if (!res.ok) throw new Error(`CTA Train Tracker HTTP ${res.status}`);
   const data = (await res.json()) as CtaTrainPredictions;
   if (data.ctatt.errCd !== "0") throw new Error(`CTA Train Tracker error ${data.ctatt.errCd}: ${data.ctatt.errNm}`);
