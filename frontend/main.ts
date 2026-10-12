@@ -3,6 +3,7 @@ import "@fontsource/montserrat";
 import "./main.css";
 import { type Panel, startRotator } from "./rotator";
 import type { Arrival, ArrivalGroup } from "../src/util/transitTypes";
+import { startWeatherEffects } from "./weatherEffects";
 
 const timeElement = document.getElementById("time")!;
 const dateElement = document.getElementById("date")!;
@@ -97,6 +98,7 @@ window.onload = (): void => {
   const mode = window.location.pathname.split("/")[1];
   updateTime();
   setInterval(updateTime, 5000);
+  startWeatherEffects();
 
   switch (mode) {
     // biome-ignore lint/suspicious/noFallthroughSwitchClause: Hey man, the logic makes sense.

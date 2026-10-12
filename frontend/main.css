@@ -203,6 +203,12 @@ body {
   grid-column: 1 / -1;
   z-index: -1;
 }
+#sky-canvas {
+  width: 100%;
+  height: 100%;
+  display: block; /* canvases are inline by default, which adds a gap below */
+  pointer-events: none; /* clicks go through to the page */
+}
 
 .wrapper {
   padding: 25px;
