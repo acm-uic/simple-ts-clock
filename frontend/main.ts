@@ -1,6 +1,7 @@
 import { getData } from "./getData";
 import "@fontsource/montserrat";
 import "./main.css";
+import { type Panel, startRotator } from "./rotator";
 
 const timeElement = document.getElementById("time")!;
 const dateElement = document.getElementById("date")!;
@@ -48,16 +49,6 @@ function updateTime(): void {
   dateElement.innerHTML = `${days[now.getDay()]} | ${months[now.getMonth()]} ${date}`;
 }
 
-const switcherElements = document.querySelectorAll<HTMLDivElement>("#switcher > div");
-let counter = 0;
-function switcher(): void {
-  if (counter === switcherElements.length) counter = 0;
-  const previous = counter === 0 ? switcherElements.length - 1 : counter - 1;
-  switcherElements[previous].style.left = "-1500px";
-  switcherElements[counter].style.left = "0px";
-  counter++;
-}
-
 window.onload = (): void => {
   const mode = window.location.pathname.split("/")[1];
   updateTime();
@@ -85,10 +76,28 @@ window.onload = (): void => {
       break;
   }
 
-  switcher();
-  if (switcherElements.length > 1) {
-    setInterval(switcher, 10000);
+  const PANEL_MS = 10_000;
+
+  const panels: Panel[] = [
+    {
+      id: "transit",
+      el: document.getElementById("transit")!,
+      durationMs: PANEL_MS,
+      isReady: () => document.querySelector("#bus li, #train li") !== null,
+    },
+  ];
+
+  const events = document.getElementById("events");
+  if (events) {
+    panels.push({
+      id: "events",
+      el: events,
+      durationMs: PANEL_MS,
+      isReady: () => events.children.length > 0,
+    });
   }
+
+  startRotator(panels, document.getElementById("fallback")!);
 
   window.onkeydown = (e: KeyboardEvent): void => {
     switch (e.code) {

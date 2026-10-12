@@ -178,8 +178,22 @@ body {
     width: 100%;
     height: 100%;
     position: absolute;
-    transition: all ease-in-out 1s;
-    left: -1500px;
+    transform: translateX(100%);
+    opacity: 0;
+    transition:
+      transform 600ms ease-in-out,
+      opacity 600ms ease-in-out;
+  }
+  & > div.is-active {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  & > div.is-leaving {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  & > div.no-transition {
+    transition: none;
   }
 }
 
