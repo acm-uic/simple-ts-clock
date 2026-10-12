@@ -12,6 +12,7 @@ body {
   -webkit-animation: Gradient 15s ease infinite;
   -moz-animation: Gradient 15s ease infinite;
   animation: Gradient 15s ease infinite;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 a {
@@ -222,16 +223,18 @@ body {
 }
 
 #weather {
-  font-size: 1.5em;
+  font-size: 1.7em;
   text-align: right;
-  margin-top: 35px;
-  i,
   p {
     display: block;
     margin: 0;
   }
-  i {
-    font-size: 1.5em;
+  p:first-child {
+    /* the description: smaller, one line, "…" if too long */
+    font-size: 0.6em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -241,77 +244,70 @@ body {
 }
 
 #cta {
+  font-size: 1.25em;
   ul {
     list-style: none;
-    clear: both;
-    li {
-      padding: 10px 0;
-      width: 50%;
-      float: left;
-    }
+    margin: 0;
+    padding: 0;
   }
-  .icon,
-  .route,
-  .direction,
-  .eta {
-    display: inline-block;
-    margin-right: 10px;
-    line-height: 80px;
+  .group {
+    display: flex; /* badge, direction and arrivals in one row */
+    align-items: baseline; /* line items up on their text, so flags don't shift the times */
+    gap: 0.5em; /* space between them */
+    padding: 0.3em 0;
   }
-  .direction {
-    font-size: 0.81em;
-    margin: 0px;
-    position: relative;
-    width: 250px;
-    left: -50px;
-    top: 25px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .eta {
-    width: 155px;
-    height: 80px;
-    border: 3px solid #ffffff;
-    border-left: none;
-    padding-left: 20px;
-    padding-right: 5px;
-    position: relative;
-    left: -50px;
-    text-align: right;
-  }
-  .icon {
-    border-radius: 50%;
-    height: 80px;
-    width: 80px;
-    text-align: center;
+  .route.icon {
+    flex: none; /* never shrink */
+    min-width: 2.2em;
+    height: 2.2em;
+    padding: 0 0.4em;
+    border-radius: 1.1em; /* a pill: a circle for "8", wider for "Blue" */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
     font-weight: bold;
   }
-  #bus {
-    .icon {
-      border: 3px solid #ffffff;
-    }
-    li {
-      display: none;
-    }
-    li:nth-child(-n + 14) {
-      display: list-item;
-    }
+  .direction {
+    flex: 1; /* takes the leftover space */
+    min-width: 0; /* allows shrinking below its text width */
+    font-size: 0.75em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* "…" instead of a hard cut */
   }
-  #train {
-    .icon {
-      background-color: #000000;
-    }
-    .eta {
-      border-color: #000000;
-      color: #000000;
-    }
-    li {
-      display: none;
-    }
-    li:nth-child(-n + 6) {
-      display: list-item;
-    }
+  .arrival {
+    flex: none;
+    min-width: 3em;
+    display: flex;
+    flex-direction: column; /* the time on top, flags below it */
+    align-items: flex-end;
+  }
+  .time {
+    font-weight: bold;
+  }
+  .flag {
+    font-size: 0.55em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .flag.delayed {
+    background: #c10000;
+    color: #ffffff;
+    border-radius: 0.3em;
+    padding: 0 0.3em;
+  }
+  .flag.scheduled {
+    opacity: 0.8;
+  }
+  .flag.full {
+    border: 1px solid currentColor;
+    border-radius: 0.3em;
+    padding: 0 0.3em;
+  }
+  #bus .route.icon {
+    border: 3px solid #ffffff; /* buses have no line color */
   }
 }
 

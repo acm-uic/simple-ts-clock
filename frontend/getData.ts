@@ -57,6 +57,13 @@ function renderGroup(g: ArrivalGroup): string {
   </li>`;
 }
 
+export function renderGroups(groups: ArrivalGroup[], mode: "bus" | "train"): string {
+  return groups
+    .filter((g) => g.mode === mode)
+    .map(renderGroup)
+    .join("");
+}
+
 export async function getData() {
   const { origin } = window.location;
   const urlParams = new URLSearchParams(window.location.search);
@@ -74,14 +81,8 @@ export async function getData() {
       );
       if (!res.ok) return; // keep whatever is on screen
       const groups: ArrivalGroup[] = await res.json();
-      document.getElementById("train")!.innerHTML = groups
-        .filter((g) => g.mode === "train")
-        .map(renderGroup)
-        .join("");
-      document.getElementById("bus")!.innerHTML = groups
-        .filter((g) => g.mode === "bus")
-        .map(renderGroup)
-        .join("");
+      document.getElementById("train")!.innerHTML = renderGroups(groups, "train");
+      document.getElementById("bus")!.innerHTML = renderGroups(groups, "bus");
     } catch (err) {
       console.error("Transit update failed:", err);
     }
