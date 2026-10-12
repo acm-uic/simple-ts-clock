@@ -1,7 +1,8 @@
-import { getData } from "./getData";
+import { getData, renderGroups } from "./getData";
 import "@fontsource/montserrat";
 import "./main.css";
 import { type Panel, startRotator } from "./rotator";
+import type { Arrival, ArrivalGroup } from "../src/util/transitTypes";
 
 const timeElement = document.getElementById("time")!;
 const dateElement = document.getElementById("date")!;
@@ -30,9 +31,52 @@ interface StringIndexes {
   [key: string]: string;
 }
 
+// Small helper so each demo arrival is one line
+const demoArrival = (minutes: number | "due", flags: Partial<Arrival> = {}): Arrival => ({
+  mode: "bus",
+  route: "",
+  direction: "",
+  destination: "",
+  stopName: "",
+  minutes,
+  delayed: false,
+  scheduledOnly: false,
+  fault: false,
+  canceled: false,
+  expressed: false,
+  ...flags,
+});
+
+const demoTransit: ArrivalGroup[] = [
+  {
+    mode: "train",
+    route: "Blue",
+    direction: "Forest Park-bound",
+    arrivals: [demoArrival("due"), demoArrival(9, { delayed: true })],
+  },
+  {
+    mode: "train",
+    route: "Blue",
+    direction: "O'Hare-bound",
+    arrivals: [demoArrival(10, { scheduledOnly: true })],
+  },
+  {
+    mode: "bus",
+    route: "8",
+    direction: "Northbound",
+    arrivals: [demoArrival(3, { crowding: "FULL" }), demoArrival(14)],
+  },
+  {
+    mode: "bus",
+    route: "60",
+    direction: "Westbound",
+    arrivals: [demoArrival(6)],
+  },
+];
+
 const demoData: StringIndexes = {
-  bus: '<li class="busItem"><span class="route icon">60</span><span class="eta">6m</span><span class="direction">Westbound</span></li><li class="busItem"><span class="route icon">8</span><span class="eta">8m</span><span class="direction">Southbound</span></li><li class="busItem"><span class="route icon">7</span><span class="eta">10m</span><span class="direction">Westbound</span></li><li class="busItem"><span class="route icon">12</span><span class="eta">11m</span><span class="direction">Westbound</span></li><li class="busItem"><span class="route icon">8</span><span class="eta">13m</span><span class="direction">Northbound</span></li><li class="busItem"><span class="route icon">12</span><span class="eta">19m</span><span class="direction">Eastbound</span></li><li class="busItem"><span class="route icon">8</span><span class="eta">24m</span><span class="direction">Southbound</span></li><li class="busItem"><span class="route icon">60</span><span class="eta">6m</span><span class="direction">Westbound</span></li><li class="busItem"><span class="route icon">8</span><span class="eta">8m</span><span class="direction">Southbound</span></li><li class="busItem"><span class="route icon">7</span><span class="eta">10m</span><span class="direction">Westbound</span></li><li class="busItem"><span class="route icon">12</span><span class="eta">11m</span><span class="direction">Westbound</span></li><li class="busItem"><span class="route icon">8</span><span class="eta">13m</span><span class="direction">Northbound</span></li><li class="busItem"><span class="route icon">12</span><span class="eta">19m</span><span class="direction">Eastbound</span></li><li class="busItem"><span class="route icon">8</span><span class="eta">24m</span><span class="direction">Southbound</span></li>',
-  train: `<li class="trainItem"><i class="fa fa-train icon" style="background-color:#03396c;"></i><span class="eta" style="color:#03396c;border-color:#03396c;">3m</span><span class="direction">Forest Park</span></li><li class="trainItem"><i class="fa fa-train icon" style="background-color:#03396c;"></i><span class="eta" style="color:#03396c;border-color:#03396c;">6m</span><span class="direction">O'Hare</span></li><li class="trainItem"><i class="fa fa-train icon" style="background-color:#03396c;"></i><span class="eta" style="color:#03396c;border-color:#03396c;">15m</span><span class="direction">Forest Park</span></li><li class="trainItem"><i class="fa fa-train icon" style="background-color:#03396c;"></i><span class="eta" style="color:#03396c;border-color:#03396c;">15m</span><span class="direction">Forest Park</span></li><li class="trainItem"><i class="fa fa-train icon" style="background-color:#03396c;"></i><span class="eta" style="color:#03396c;border-color:#03396c;">19m</span><span class="direction">O'Hare</span></li>`,
+  bus: renderGroups(demoTransit, "bus"),
+  train: renderGroups(demoTransit, "train"),
   weather: "<p>Mostly Clear (est.)</p><p>61 &#176;F | 16 &#176;C</p>",
   messages: "<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore eveniet pariatur sed expedita</p>",
   events:

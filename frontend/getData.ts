@@ -1,4 +1,5 @@
 import type { Weather } from "../src/util/weatherTypes";
+import type { Arrival, ArrivalGroup } from "../src/util/transitTypes";
 interface StringIndexes {
   [key: string]: string;
 }
@@ -7,76 +8,13 @@ const ctaRouteColors: StringIndexes = {
   // TODO: Pick Better Colors
   Red: "#c10000",
   Blue: "#03396c",
-  Brown: "#560d0d",
-  Green: "#004a2f",
-  Orange: "#ff6337",
+  Brn: "#560d0d",
+  G: "#004a2f",
+  Org: "#ff6337",
   Pink: "#ff3e6d",
-  Purple: "#866ec7",
-  Yellow: "#e4c666",
+  P: "#866ec7",
+  Y: "#e4c666",
 };
-
-interface CtaBusPrediction {
-  tmstmp: string;
-  typ: string;
-  stpnm: string;
-  stpid: string;
-  vid: string;
-  dstp: number;
-  rt: string;
-  rtdd: string;
-  rtdir: string;
-  des: string;
-  prdtm: string;
-  tablockid: string;
-  tatripid: string;
-  dly: boolean;
-  prdctdn: string;
-  zone: string;
-}
-
-interface CtaBusError {
-  stpid: string;
-  msg: string;
-}
-
-interface CtaBusPredictions {
-  "bustime-response": {
-    prd?: CtaBusPrediction[];
-    error?: CtaBusError[];
-  };
-}
-
-interface CtaTrainPrediction {
-  staId: string;
-  stpId: string;
-  staNm: string;
-  stpDe: string;
-  rn: string;
-  rt: string;
-  destSt: string;
-  destNm: string;
-  trDr: string;
-  prdt: Date;
-  arrT: Date;
-  isApp: string;
-  isSch: string;
-  isDly: string;
-  isFlt: string;
-  flags: boolean;
-  lat: string;
-  lon: string;
-  heading: string;
-}
-
-interface CtaTrainPredictions {
-  ctatt: {
-    tmst: string;
-    errCd: string;
-    errNm: number;
-    eta: CtaTrainPrediction[];
-  };
-}
-
 export interface Config {
   ctaBusStops?: string[];
   ctaTrainStations?: string[];
@@ -96,6 +34,36 @@ export function clearData(elementSelector?: string): void {
   }
 }
 
+// One arrival: "Due" or "7m", plus its flags
+function renderArrival(a: Arrival): string {
+  const time = a.minutes === "due" ? "Due" : `${a.minutes}m`;
+
+  const flags = [
+    a.delayed ? `<span class="flag delayed">Delayed</span>` : "",
+    a.scheduledOnly ? `<span class="flag scheduled">sched.</span>` : "",
+    a.crowding === "FULL" ? `<span class="flag full">Full</span>` : "",
+  ].join("");
+
+  return `<span class="arrival"><span class="time">${time}</span>${flags}</span>`;
+}
+
+// One group: route badge, direction, up to two arrivals
+function renderGroup(g: ArrivalGroup): string {
+  const color = ctaRouteColors[g.route] ?? "";
+  return `<li class="group">
+    <span class="route icon" style="background-color:${color}">${g.route}</span>
+    <span class="direction">${g.direction}</span>
+    ${g.arrivals.map(renderArrival).join("")}
+  </li>`;
+}
+
+export function renderGroups(groups: ArrivalGroup[], mode: "bus" | "train"): string {
+  return groups
+    .filter((g) => g.mode === mode)
+    .map(renderGroup)
+    .join("");
+}
+
 export async function getData() {
   const { origin } = window.location;
   const urlParams = new URLSearchParams(window.location.search);
@@ -106,44 +74,19 @@ export async function getData() {
     eventCalendars: urlParams.get("eventCalendars"),
   };
 
-  clearData("#bus");
   (async () => {
-    const res = await fetch(`${origin}/api/ctaBus?bus=${config.ctaBusStops}`);
-    const result = await res.json();
-    const timeNow = new Date();
-    if (Object.hasOwn(result["bustime-response"], "prd")) {
-      for (let i = 0; i < result["bustime-response"].prd!.length; i++) {
-        const timeFromApi = result["bustime-response"].prd![i].prdtm;
-        const prdTime = new Date(`${timeFromApi.slice(0, 4)}/${timeFromApi.slice(4, 6)}/${timeFromApi.slice(6, 16)}`);
-        const eta = Math.floor(Math.abs(prdTime.valueOf() - timeNow.valueOf()) / 1000 / 60);
-        document.getElementById("bus")!.innerHTML +=
-          `<li class='busItem'><span class='route icon'>${result["bustime-response"].prd[i].rt}</span><span class='eta'>${eta}m</span><span class='direction'>${result["bustime-response"].prd[i].rtdir}</span></li>`;
-      }
-      result["bustime-response"].prd!.forEach((ele: CtaBusPrediction): void => {
-        const timeFromApi = ele.prdtm;
-        const prdTime = new Date(`${timeFromApi.slice(0, 4)}/${timeFromApi.slice(4, 6)}/${timeFromApi.slice(6, 16)}`);
-        const eta = Math.floor(Math.abs(prdTime.valueOf() - timeNow.valueOf()) / 1000 / 60);
-        document.getElementById("bus")!.innerHTML +=
-          `<li class='busItem'><span class='route icon'>${ele.rt}</span><span class='eta'>${eta}m</span><span class='direction'>${ele.rtdir}</span></li>`;
-      });
+    try {
+      const res = await fetch(
+        `${origin}/api/transit?bus=${config.ctaBusStops ?? ""}&train=${config.ctaTrainStations ?? ""}`,
+      );
+      if (!res.ok) return; // keep whatever is on screen
+      const groups: ArrivalGroup[] = await res.json();
+      document.getElementById("train")!.innerHTML = renderGroups(groups, "train");
+      document.getElementById("bus")!.innerHTML = renderGroups(groups, "bus");
+    } catch (err) {
+      console.error("Transit update failed:", err);
     }
   })();
-
-  clearData("#train");
-  config.ctaTrainStations!.split(",").forEach((ele): void => {
-    (async () => {
-      const res = await fetch(`${origin}/api/ctaTrain?train=${ele}`);
-      const result = await res.json();
-      const timeNow = new Date();
-      for (let j = 0; j < result.ctatt.eta.length; j++) {
-        const prdTime = new Date(result.ctatt.eta[j].arrT);
-        const eta = Math.floor(Math.abs(prdTime.valueOf() - timeNow.valueOf()) / 1000 / 60);
-        const routeColor = ctaRouteColors[result.ctatt.eta[j].rt];
-        document.getElementById("train")!.innerHTML +=
-          `<li class='trainItem'><i class='fa fa-train icon' style=background-color:${routeColor};></i><span class='eta' style=color:${routeColor};border-color:${routeColor};>${eta}m</span><span class='direction'>${result.ctatt.eta[j].destNm}</span></li>`;
-      }
-    })();
-  });
 
   (async () => {
     try {
