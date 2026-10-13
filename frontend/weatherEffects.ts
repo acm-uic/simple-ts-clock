@@ -1,8 +1,12 @@
-interface Drop {
-    x: number;
-    y: number;
-    speed: number;
-    length: number;
+type Effect = "rain" | "snow" | "none";
+const EFFECTS = ["rain", "snow", "none"] as const;
+
+interface Particle {
+  x: number;
+  y: number;
+  speed: number; // falling speed, units/s
+  size: number; // streak len for rain, dot radius for snow
+  drift: number; // sideways speed, units/s
 }
 
 export function fitCanvas(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
@@ -21,12 +25,37 @@ export function startWeatherEffects(): void {
   let ctx = fitCanvas(canvas);
   let { width, height } = canvas.getBoundingClientRect();
 
-  const drops: Drop[] = Array.from({ length: 150 }, () => ({
-    x: Math.random() * width,
-    y: Math.random() * height,
-    speed: 700 + Math.random() * 400,
-    length: 10 + Math.random() * 10,
-  }));
+  let effect: Effect = "rain";
+  let particles: Particle[] = [];
+
+  // anywhere = true: random y (for filling the screen at the start)
+  // anywhere = false: just above the top (for recycling)
+  function makeParticle(anywhere: boolean): Particle {
+    if (effect === "snow") {
+      const size = 1.5 + Math.random() * 2;
+      return {
+        x: Math.random() * width,
+        y: anywhere ? Math.random() * height : -size,
+        speed: 40 + Math.random() * 50,
+        size,
+        drift: -20 + Math.random() * 40,
+      };
+    }
+    const size = 10 + Math.random() * 10;
+    return {
+      x: Math.random() * width,
+      y: anywhere ? Math.random() * height : -size,
+      speed: 700 + Math.random() * 400,
+      size,
+      drift: 0,
+    };
+  }
+
+  function setEffect(next: Effect): void {
+    effect = next;
+    const count = next === "rain" ? 150 : next === "snow" ? 120 : 0;
+    particles = Array.from({ length: count }, () => makeParticle(true));
+  }
 
   let lastTime = performance.now();
 
@@ -37,21 +66,28 @@ export function startWeatherEffects(): void {
     ctx.clearRect(0, 0, width, height);
     ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
     ctx.lineWidth = 1.5;
-
-    for (const d of drops) {
-        d.y += d.speed * seconds;
-        if (d.y > height) {
-            d.y = -d.length;
-            d.x = Math.random() * width;
-        }
-        ctx.beginPath();
-        ctx.moveTo(d.x, d.y);
-        ctx.lineTo(d.x - 2, d.y + d.length);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+    for (const p of particles) {
+      p.y += p.speed * seconds;
+      p.x += p.drift * seconds;
+      if (p.y > height) Object.assign(p, makeParticle(false));
+      ctx.beginPath();
+      if (effect === "snow") {
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.moveTo(p.x, p.y);
+        ctx.lineTo(p.x - 2, p.y + p.size);
         ctx.stroke();
+      }
     }
 
     requestAnimationFrame(frame);
   }
+
+  const wx = new URLSearchParams(window.location.search).get("wx");
+  const forced = EFFECTS.find((e) => e === wx);
+  setEffect(forced ?? "rain");
 
   requestAnimationFrame(frame);
 
