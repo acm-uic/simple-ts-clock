@@ -1,5 +1,23 @@
 type Effect = "rain" | "snow" | "none";
-const EFFECTS = ["rain", "snow", "none"] as const;
+const CONDITIONS = ["clear", "cloudy", "rain", "snow", "storm", "fog"] as const;
+const INTENSITIES = ["light", "normal", "heavy"] as const;
+
+import type { Condition, Intensity, Weather } from "../src/util/weatherTypes";
+
+const EFFECT_FOR: Record<Condition, Effect> = {
+  clear: "none",
+  cloudy: "none",
+  rain: "rain",
+  snow: "snow",
+  storm: "rain",
+  fog: "none",
+};
+
+const AMOUNT_FOR: Record<Intensity, number> = {
+  light: 0.5, // half the particles
+  normal: 1,
+  heavy: 2.5,
+};
 
 interface Particle {
   x: number;
@@ -7,6 +25,13 @@ interface Particle {
   speed: number; // falling speed, units/s
   size: number; // streak len for rain, dot radius for snow
   drift: number; // sideways speed, units/s
+}
+
+// Set by startWeatherEffects; lets showWeather reach the running animation
+let applyWeather: ((w: Weather) => void) | undefined;
+
+export function showWeather(w: Weather): void {
+  applyWeather?.(w);
 }
 
 export function fitCanvas(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
@@ -51,10 +76,16 @@ export function startWeatherEffects(): void {
     };
   }
 
-  function setEffect(next: Effect): void {
+  function setEffect(next: Effect, amount = 1): void {
+    const count = Math.round((next === "rain" ? 150 : next === "snow" ? 120 : 0) * amount);
+    if (next === effect && count === particles.length) return;
     effect = next;
-    const count = next === "rain" ? 150 : next === "snow" ? 120 : 0;
     particles = Array.from({ length: count }, () => makeParticle(true));
+  }
+
+  function applyCondition(condition: Condition, intensity: Intensity): void {
+    const amount = condition === "storm" ? AMOUNT_FOR.heavy : AMOUNT_FOR[intensity];
+    setEffect(EFFECT_FOR[condition], amount);
   }
 
   let lastTime = performance.now();
@@ -85,9 +116,15 @@ export function startWeatherEffects(): void {
     requestAnimationFrame(frame);
   }
 
-  const wx = new URLSearchParams(window.location.search).get("wx");
-  const forced = EFFECTS.find((e) => e === wx);
-  setEffect(forced ?? "rain");
+  const params = new URLSearchParams(window.location.search);
+  const forced = CONDITIONS.find((c) => c === params.get("wx"));
+  const forcedIntensity = INTENSITIES.find((i) => i === params.get("wxi")) ?? "normal";
+  applyCondition(forced ?? "clear", forcedIntensity);
+
+  applyWeather = (w) => {
+    if (forced) return; // ?wx= overrides the real weather while testing
+    applyCondition(w.condition, w.intensity);
+  };
 
   requestAnimationFrame(frame);
 

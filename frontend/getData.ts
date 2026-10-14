@@ -1,4 +1,5 @@
 import type { Weather } from "../src/util/weatherTypes";
+import { showWeather } from "./weatherEffects";
 import type { Arrival, ArrivalGroup } from "../src/util/transitTypes";
 interface StringIndexes {
   [key: string]: string;
@@ -95,6 +96,7 @@ export async function getData() {
       const w: Weather = await res.json();
       const html = `<p>${w.description}${w.source === "forecast" ? " (est.)" : ""}</p><p>${w.tempF} &#176;F | ${w.tempC} &#176;C</p>`;
       document.getElementById("weather")!.innerHTML = html;
+      showWeather(w);
     } catch (err) {
       console.error("Weather update failed:", err);
     }
