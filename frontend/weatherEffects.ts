@@ -1,8 +1,8 @@
+import type { Condition, Intensity, Weather } from "../src/util/weatherTypes";
+
 type Effect = "rain" | "snow" | "none";
 const CONDITIONS = ["clear", "cloudy", "rain", "snow", "storm", "fog"] as const;
 const INTENSITIES = ["light", "normal", "heavy"] as const;
-
-import type { Condition, Intensity, Weather } from "../src/util/weatherTypes";
 
 const EFFECT_FOR: Record<Condition, Effect> = {
   clear: "none",
@@ -11,6 +11,16 @@ const EFFECT_FOR: Record<Condition, Effect> = {
   snow: "snow",
   storm: "rain",
   fog: "none",
+};
+
+// How visible the clouds are (0 to 1), and their color as "r, g, b"
+const CLOUDS_FOR: Record<Condition, { amount: number; rgb: string }> = {
+  clear: { amount: 0.15, rgb: "255, 255, 255" },
+  cloudy: { amount: 0.8, rgb: "235, 238, 242" },
+  rain: { amount: 0.6, rgb: "190, 195, 205" },
+  snow: { amount: 0.5, rgb: "245, 247, 250" },
+  storm: { amount: 0.9, rgb: "90, 95, 110" },
+  fog: { amount: 0.4, rgb: "230, 232, 235" },
 };
 
 const AMOUNT_FOR: Record<Intensity, number> = {
@@ -57,6 +67,9 @@ export function fitCanvas(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
 
 export function startWeatherEffects(): void {
   const canvas = document.getElementById("sky-canvas") as HTMLCanvasElement;
+  const sky = document.getElementById("sky") as HTMLElement;
+  const tints = Array.from(document.querySelectorAll<HTMLElement>(".sky-tint"));
+  const night = document.querySelector<HTMLElement>(".sky-night");
   let ctx = fitCanvas(canvas);
   let { width, height } = canvas.getBoundingClientRect();
 
@@ -103,10 +116,29 @@ export function startWeatherEffects(): void {
     particles = Array.from({ length: count }, () => makeParticle(true));
   }
 
-  function applyCondition(next: Condition, intensity: Intensity): void {
+  // Fade to a new tint: put the new class on the hidden layer, then swap which
+  // layer is visible. Both layers fade over 3 s (CSS), so it crossfades.
+  let frontTint = 0;
+  let tintCondition: Condition | undefined;
+  function setTint(next: Condition): void {
+    if (next === tintCondition || tints.length < 2) return;
+    tintCondition = next;
+    const back = tints[1 - frontTint];
+    back.className = `sky-tint sky-${next}`;
+    void back.offsetWidth; // apply the new class before fading in (same trick as placeAtStart)
+    back.classList.add("is-visible");
+    tints[frontTint].classList.remove("is-visible");
+    frontTint = 1 - frontTint;
+  }
+
+  function applyCondition(next: Condition, intensity: Intensity, isDay: boolean): void {
     condition = next;
     const amount = next === "storm" ? AMOUNT_FOR.heavy : AMOUNT_FOR[intensity];
     setEffect(EFFECT_FOR[next], amount);
+    setTint(next);
+    night?.classList.toggle("is-visible", !isDay);
+    sky.style.setProperty("--cloudiness", String(CLOUDS_FOR[next].amount));
+    sky.style.setProperty("--cloud-rgb", CLOUDS_FOR[next].rgb);
   }
 
   function lightning(seconds: number): void {
@@ -174,11 +206,12 @@ export function startWeatherEffects(): void {
   const params = new URLSearchParams(window.location.search);
   const forced = CONDITIONS.find((c) => c === params.get("wx"));
   const forcedIntensity = INTENSITIES.find((i) => i === params.get("wxi")) ?? "normal";
-  applyCondition(forced ?? "clear", forcedIntensity);
+  const forcedDay = params.get("wxtime") !== "night"; // ?wxtime=night tests the night sky
+  applyCondition(forced ?? "clear", forcedIntensity, forcedDay);
 
   applyWeather = (w) => {
     if (forced) return; // ?wx= overrides the real weather while testing
-    applyCondition(w.condition, w.intensity);
+    applyCondition(w.condition, w.intensity, w.isDay);
   };
 
   requestAnimationFrame(frame);

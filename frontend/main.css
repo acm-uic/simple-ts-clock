@@ -202,12 +202,109 @@ body {
   grid-row: 1 / 4;
   grid-column: 1 / -1;
   z-index: -1;
+  position: relative; /* children below are placed relative to the sky */
+  /* Bleed past the wrapper's 25px padding so the sky reaches the screen edges */
+  margin: -25px -25px 0;
 }
 #sky-canvas {
+  position: relative; /* drawn above the absolutely placed layers before it */
   width: 100%;
   height: 100%;
   display: block; /* canvases are inline by default, which adds a gap below */
   pointer-events: none; /* clicks go through to the page */
+}
+
+/* Sky tint: two stacked layers; JS swaps which one is visible to fade
+   between conditions (CSS can't animate from one gradient to another). */
+.sky-tint,
+.sky-night,
+.clouds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.sky-tint {
+  opacity: 0;
+  transition: opacity 3s ease;
+  &.is-visible {
+    opacity: 1;
+  }
+}
+/* Semi-transparent, so the page's animated gradient still shows through */
+.sky-clear {
+  background: linear-gradient(to bottom, rgba(70, 150, 230, 0.25), transparent);
+}
+.sky-cloudy {
+  background: linear-gradient(to bottom, rgba(120, 130, 145, 0.4), rgba(120, 130, 145, 0.1));
+}
+.sky-rain {
+  background: linear-gradient(to bottom, rgba(70, 85, 105, 0.5), rgba(70, 85, 105, 0.15));
+}
+.sky-storm {
+  background: linear-gradient(to bottom, rgba(30, 35, 50, 0.65), rgba(30, 35, 50, 0.25));
+}
+.sky-snow {
+  background: linear-gradient(to bottom, rgba(200, 210, 225, 0.35), rgba(200, 210, 225, 0.1));
+}
+.sky-fog {
+  background: rgba(210, 215, 220, 0.45);
+}
+/* Night darkens whatever the condition is */
+.sky-night {
+  background: linear-gradient(to bottom, rgba(10, 15, 40, 0.6), rgba(10, 15, 40, 0.3));
+  opacity: 0;
+  transition: opacity 3s ease;
+  &.is-visible {
+    opacity: 1;
+  }
+}
+
+/* Clouds: soft radial-gradient blobs drifting slowly. JS sets --cloudiness
+   (how visible) and --cloud-rgb (white, grey, or dark) from the condition. */
+.clouds {
+  overflow: hidden;
+  opacity: var(--cloudiness, 0.2);
+  transition: opacity 3s ease;
+}
+.cloud {
+  position: absolute;
+  width: 60%;
+  height: 70%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(var(--cloud-rgb, 255, 255, 255), 0.8), transparent);
+  animation: cloud-drift 120s linear infinite;
+}
+/* Different heights, sizes, and speeds; negative delays spread them out at load */
+.cloud:nth-child(1) {
+  top: -20%;
+  animation-duration: 140s;
+  animation-delay: -20s;
+}
+.cloud:nth-child(2) {
+  top: 15%;
+  width: 45%;
+  animation-duration: 110s;
+  animation-delay: -70s;
+}
+.cloud:nth-child(3) {
+  top: 40%;
+  width: 70%;
+  animation-duration: 160s;
+  animation-delay: -110s;
+}
+.cloud:nth-child(4) {
+  top: 5%;
+  width: 40%;
+  animation-duration: 95s;
+  animation-delay: -40s;
+}
+@keyframes cloud-drift {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(180%);
+  }
 }
 
 .wrapper {
