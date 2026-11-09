@@ -2,7 +2,9 @@ import { getData, renderGroups } from "./getData";
 import "@fontsource/montserrat";
 import "./main.css";
 import { type Panel, startRotator } from "./rotator";
+import type { TickerItem } from "../src/util/tickerTypes";
 import type { Arrival, ArrivalGroup } from "../src/util/transitTypes";
+import { fitTicker, getMessages, renderTicker } from "./getMessages";
 import { startWeatherEffects } from "./weatherEffects";
 
 const timeElement = document.getElementById("time")!;
@@ -75,11 +77,18 @@ const demoTransit: ArrivalGroup[] = [
   },
 ];
 
+const demoTicker: TickerItem[] = [
+  { source: "weather", level: "severe", text: "Winter Storm Warning issued for Cook County until 6 PM", time: 0 },
+  { source: "cta", level: "warning", text: "Blue Line: Trains operating with delays near UIC-Halsted", time: 0 },
+  { source: "github", level: "info", text: "PR #54 merged in simple-ts-clock", time: 0 },
+  { source: "github", level: "info", text: "sammypatel06 pushed to simple-ts-clock", time: 0 },
+];
+
 const demoData: StringIndexes = {
   bus: renderGroups(demoTransit, "bus"),
   train: renderGroups(demoTransit, "train"),
   weather: "<p>Mostly Clear (est.)</p><p>61 &#176;F | 16 &#176;C</p>",
-  messages: "<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore eveniet pariatur sed expedita</p>",
+  messages: renderTicker(demoTicker),
   events:
     '<ul><li class="event happeningNow"><div class=eventName><span>Test Event 1</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 2</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 3</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 4</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 5</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 6</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 7</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 8</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div></ul>',
 };
@@ -113,12 +122,15 @@ window.onload = (): void => {
         }
         element.innerHTML = demoData[key];
       }
+      fitTicker();
     case "offline":
       document.getElementById(`${mode}Mode`)!.style.display = "block";
       break;
     default:
       getData();
       setInterval(getData, 120000);
+      getMessages();
+      setInterval(getMessages, 300000); // 5 minutes; the server caches each source too
       break;
   }
 

@@ -131,7 +131,7 @@ body {
   height: 100vh;
   border: 1px solid #000000;
   display: grid;
-  grid-template-areas: "time time time weather weather" "date date date date date" "acm-discord-qr-code-label acm-discord-qr-code lug-discord-qr-code-label lug-discord-qr-code messages" "switcher switcher switcher switcher switcher" "footer footer footer footer footer";
+  grid-template-areas: "time time time weather weather" "date date date date date" "acm-discord-qr-code-label acm-discord-qr-code lug-discord-qr-code-label lug-discord-qr-code ." "switcher switcher switcher switcher switcher" "messages messages messages messages messages";
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   grid-template-rows: 0.35fr 0.12fr 0.53fr 2fr 3rem;
   #time {
@@ -166,9 +166,6 @@ body {
   #lug-discord-qr-code {
     grid-area: lug-discord-qr-code;
     place-self: center;
-  }
-  #footer {
-    grid-area: footer;
   }
 }
 
@@ -341,9 +338,55 @@ body {
   }
 }
 
+/* Ticker: the bottom row. The content is in the track twice; sliding left by
+   half the track (one copy) and starting over loops without a visible jump. */
 #messages {
-  display: none;
   grid-area: messages;
+  display: flex;
+  align-items: center;
+  font-size: 0.6em;
+  white-space: nowrap;
+}
+.ticker-track {
+  display: flex;
+  animation: ticker-scroll var(--ticker-duration, 60s) linear infinite;
+}
+.ticker-copy {
+  display: flex;
+  flex: none;
+}
+.ticker-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+  padding: 0 1.5em;
+}
+.ticker-source {
+  font-size: 0.7em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid currentColor;
+  border-radius: 0.3em;
+  padding: 0 0.35em;
+}
+.ticker-item.severe {
+  background: #c10000;
+  border-radius: 0.3em;
+}
+.ticker-item.warning .ticker-source {
+  background: #f2b33d;
+  border-color: #f2b33d;
+  color: #000000;
+  text-shadow: none;
+}
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 #cta {
@@ -449,9 +492,4 @@ img.qrCode {
 
 #app-repo-qr-code {
   display: none;
-}
-
-#footer {
-  text-align: center;
-  font-size: 0.5em;
 }
