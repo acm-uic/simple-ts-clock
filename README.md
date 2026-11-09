@@ -48,6 +48,15 @@ Demo mode works like offline mode but displays demo information instead of real 
 ### Configuration
 To override the default config, you can use the URL GET parameters or by pressing `c` to open the config options.
 
+### How to add a flyer
+The flyers panel shows images from the shared [Put Clock Flyers Here](https://drive.google.com/drive/folders/1P5ww7kSd9eH6Cc_kTazQcaO-fGglCUgy) Drive folder, one per rotation.
+
+1. Export the flyer as **PNG or JPG** (phone photos in HEIC format won't show). Tall (portrait) flyers fill the screen best.
+2. Start the file name with the event date, `MM-DD-YY` or `YYYY-MM-DD`, e.g. `11-14-26 Stump The Professors.png`. The flyer is shown through that date and hidden automatically afterwards. Files without a date stay until you remove them.
+3. Drop it into the folder. The clock picks it up within about 5 minutes.
+
+Files over 15 MB are skipped, so keep exports reasonably small.
+
 ## Deployment
 
 To deploy to ACM's clock machine, simply run

@@ -501,6 +501,29 @@ body {
   }
 }
 
+/* Flyers: the flyer fits inside the panel without stretching; a blurred,
+   darkened copy behind it fills the empty space. */
+#flyers .flyer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  img {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+.flyer-bg {
+  position: absolute;
+  inset: -40px; /* past the edges, so the blur doesn't fade out at the borders */
+  background-size: cover;
+  background-position: center;
+  filter: blur(30px) brightness(0.5);
+}
+
 img.qrCode {
   width: 200px;
   height: 200px;

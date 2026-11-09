@@ -6,6 +6,7 @@ import type { CalEvent } from "../src/util/calendarTypes";
 import type { TickerItem } from "../src/util/tickerTypes";
 import type { Arrival, ArrivalGroup } from "../src/util/transitTypes";
 import { renderEvents } from "./events";
+import { flyersReady, setFlyers, showNextFlyer } from "./flyers";
 import { fitTicker, getMessages, renderTicker } from "./getMessages";
 import { startWeatherEffects } from "./weatherEffects";
 
@@ -167,6 +168,10 @@ window.onload = (): void => {
         element.innerHTML = demoData[key];
       }
       fitTicker();
+      setFlyers([
+        { url: "/demo-flyers/tall.svg", name: "Demo flyer (tall)" },
+        { url: "/demo-flyers/wide.svg", name: "Demo flyer (wide)" },
+      ]);
     case "offline":
       document.getElementById(`${mode}Mode`)!.style.display = "block";
       break;
@@ -196,6 +201,17 @@ window.onload = (): void => {
       el: events,
       durationMs: PANEL_MS,
       isReady: () => events.querySelector("li.event:not(.finished)") !== null,
+    });
+  }
+
+  const flyers = document.getElementById("flyers");
+  if (flyers) {
+    panels.push({
+      id: "flyers",
+      el: flyers,
+      durationMs: PANEL_MS,
+      isReady: flyersReady,
+      refresh: showNextFlyer, // a different flyer each turn
     });
   }
 
