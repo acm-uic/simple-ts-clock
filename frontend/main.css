@@ -461,27 +461,43 @@ body {
   ul {
     font-size: 0.75em;
     list-style: none;
-    clear: both;
-    li.event {
-      padding: 15px;
-      float: left;
-      width: 50%;
-      span {
-        margin: 5px 0;
-      }
-      .eventName {
-        font-size: 1.15em;
-        margin-bottom: 5px;
-      }
-      .icon {
-        width: 1.25em;
-      }
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5em 1em;
+  }
+  li.event {
+    padding: 15px;
+    min-width: 0; /* let long titles shrink instead of widening the column */
+    span {
+      margin: 5px 0;
     }
-    li.event.happeningNow {
-      .eventName {
-        text-decoration: underline;
-      }
+    .eventName {
+      font-size: 1.15em;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: baseline;
+      gap: 0.4em;
     }
+    .eventLabel {
+      flex: none;
+      font-size: 0.6em;
+      font-weight: 600;
+      padding: 0.1em 0.4em;
+      border-radius: 0.3em;
+      text-shadow: none;
+    }
+    .icon {
+      width: 1.25em;
+    }
+  }
+  li.event.happeningNow {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 0.4em;
+  }
+  li.event.finished {
+    opacity: 0.5;
   }
 }
 

@@ -1,4 +1,5 @@
 import type { TickerItem } from "../src/util/tickerTypes";
+import { escapeHtml } from "./escapeHtml";
 
 const PIXELS_PER_SECOND = 90; // scroll speed, the same however long the text is
 
@@ -15,12 +16,6 @@ const CONTRIBUTE: TickerItem = {
   text: "Contribute to this clock: github.com/acm-uic/simple-ts-clock",
   time: 0,
 };
-
-// Text comes from outside sources (GitHub usernames, alert text), so escape it
-// before it goes into innerHTML.
-function escapeHtml(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
 
 // The content twice in a row; sliding left by exactly one copy loops seamlessly
 export function renderTicker(items: TickerItem[]): string {

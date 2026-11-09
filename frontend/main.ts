@@ -2,8 +2,10 @@ import { getData, renderGroups } from "./getData";
 import "@fontsource/montserrat";
 import "./main.css";
 import { type Panel, startRotator } from "./rotator";
+import type { CalEvent } from "../src/util/calendarTypes";
 import type { TickerItem } from "../src/util/tickerTypes";
 import type { Arrival, ArrivalGroup } from "../src/util/transitTypes";
+import { renderEvents } from "./events";
 import { fitTicker, getMessages, renderTicker } from "./getMessages";
 import { startWeatherEffects } from "./weatherEffects";
 
@@ -84,13 +86,55 @@ const demoTicker: TickerItem[] = [
   { source: "github", level: "info", text: "sammypatel06 pushed to simple-ts-clock", time: 0 },
 ];
 
+// Demo events relative to now, so "happening now" and "finished" always show
+const HOUR = 60 * 60 * 1000;
+const at = (hoursFromNow: number) => new Date(Date.now() + hoursFromNow * HOUR).toISOString();
+const todayChicago = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date());
+const demoEvents: CalEvent[] = [
+  {
+    title: "Fall Hackathon Signups",
+    start: todayChicago,
+    end: "9999-12-31",
+    allDay: true,
+    label: "ACM",
+    color: "#1e6fd9",
+  },
+  {
+    title: "SIG Systems",
+    start: at(-3),
+    end: at(-2),
+    allDay: false,
+    location: "CDRLC 2433",
+    label: "ACM",
+    color: "#1e6fd9",
+  },
+  {
+    title: "Homebrew User Group",
+    start: at(-0.5),
+    end: at(1),
+    allDay: false,
+    location: "ACM/LUG Office: CDRLC 2433",
+    label: "LUG",
+    color: "#2e8b57",
+  },
+  {
+    title: "SIG AI Project",
+    start: at(2),
+    end: at(3),
+    allDay: false,
+    location: "CDRLC 2433",
+    label: "ACM",
+    color: "#1e6fd9",
+  },
+  { title: "Game Dev User Group", start: at(4), end: at(5.5), allDay: false, label: "LUG", color: "#2e8b57" },
+];
+
 const demoData: StringIndexes = {
   bus: renderGroups(demoTransit, "bus"),
   train: renderGroups(demoTransit, "train"),
   weather: "<p>Mostly Clear (est.)</p><p>61 &#176;F | 16 &#176;C</p>",
   messages: renderTicker(demoTicker),
-  events:
-    '<ul><li class="event happeningNow"><div class=eventName><span>Test Event 1</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 2</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 3</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 4</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 5</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 6</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 7</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 8</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div></ul>',
+  events: renderEvents(demoEvents),
 };
 
 function updateTime(): void {
@@ -151,7 +195,7 @@ window.onload = (): void => {
       id: "events",
       el: events,
       durationMs: PANEL_MS,
-      isReady: () => events.children.length > 0,
+      isReady: () => events.querySelector("li.event:not(.finished)") !== null,
     });
   }
 

@@ -1,120 +1,99 @@
-import fs from "node:fs";
-import readline from "node:readline";
 import dotenv from "dotenv";
-import { google } from "googleapis";
-import type { OAuth2Client } from "googleapis-common";
+import type { CalEvent, GoogleEvent, GoogleEventList } from "./calendarTypes";
+import { cached } from "./cached";
 
 dotenv.config();
 
-const calId = process.env.GOOGLE_CALENDAR_ID;
+// The calendars the clock may read: also the allowlist for /api/events, so nobody
+// can use the server's API key to read other calendars.
+export const CALENDARS: Record<string, { label: string; color: string }> = {
+  "kc72g1ctfg8b88df34qqb62d1s@group.calendar.google.com": { label: "ACM", color: "#1e6fd9" },
+  "c_d025da6dd12eef635c3eaadaa5f28ec45c98523cd5241f7248da67632f8522ff@group.calendar.google.com": {
+    label: "LUG",
+    color: "#2e8b57",
+  },
+};
 
-// If modifying these scopes, delete token.json.
-const SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first
-// time.
-const TOKEN_PATH = "token.json";
-
-interface EventUI {
-  start: Date;
-  end: Date;
-  name: string;
-  location?: string;
-}
-
-/**
- * Get and store new token after prompting for user authorization, and then
- * execute the given callback with the authorized OAuth2 client.
- * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
- * @param {getEventsCallback} callback The callback for the authorized client.
- */
-function getAccessToken(oAuth2Client: OAuth2Client, callback: any): void {
-  const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: "offline",
-    scope: SCOPES,
-  });
-  console.log("Authorize this app by visiting this url:", authUrl);
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  rl.question("Enter the code from that page here: ", (code): void => {
-    rl.close();
-    oAuth2Client.getToken(code, (err, token): void => {
-      if (err) console.error("Error retrieving access token", err);
-      oAuth2Client.setCredentials(token);
-      // Store the token to disk for later program executions
-      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err): void => {
-        if (err) console.error(err);
-        console.log("Token stored to", TOKEN_PATH);
-      });
-      callback(oAuth2Client);
-    });
-  });
-}
-
-/**
- * Lists the next 10 events on the user's primary calendar.
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
-function getEvents(auth: OAuth2Client): void {
-  const calendar = google.calendar({ version: "v3", auth });
-  calendar.events.list(
-    {
-      calendarId: calId,
-      timeMin: new Date().toISOString(),
-      maxResults: 10,
-      singleEvents: true,
-      orderBy: "startTime",
-    },
-    (err, res): void => {
-      if (err) console.log(`The API returned an error: ${err}`);
-      const events = res.data.items;
-      if (events.length) {
-        console.log(`Upcoming 10 events for ${res.data.summary}:`);
-        events.forEach((event, i): void => {
-          const name = event.summary;
-          const location = event.location;
-          const start = event.start.dateTime || event.start.date;
-          const end = event.end.dateTime || event.end.date;
-          console.log(`${name} - ${location} - ${start} - ${end}`);
-        });
-      } else {
-        console.log("No upcoming events found.");
-      }
-    },
-  );
-}
-
-interface Credentials {
-  installed: {
-    client_secret: string;
-    client_id: string;
-    redirect_uris: string[];
-  };
-}
-
-/**
- * Create an OAuth2 client with the given credentials, and then execute the
- * given callback function.
- * @param {Object} credentials The authorization client credentials.
- * @param {function} callback The callback to call with the authorized client.
- */
-function authorize(credentials: Credentials, callback: any): any {
-  const { client_secret, client_id, redirect_uris } = credentials.installed;
-  const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-
-  // Check if we have previously stored a token.
-  fs.readFile(TOKEN_PATH, (err, token): void => {
-    if (err) getAccessToken(oAuth2Client, callback);
-    oAuth2Client.setCredentials(JSON.parse(token.toString()));
-    callback(oAuth2Client);
-  });
-}
-
-// Load client secrets from a local file.
-fs.readFile("credentials.json", (err: NodeJS.ErrnoException, content: Buffer): void => {
-  if (err) console.log("Error loading client secret file:", err);
-  // Authorize a client with credentials, then call the Google Calendar API.
-  authorize(JSON.parse(content.toString()), getEvents);
+// "2026-11-09" for a moment in Chicago; text in this form compares correctly
+const chicagoDate = new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/Chicago",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
 });
+
+async function fetchCalendar(id: string, apiKey: string): Promise<CalEvent[]> {
+  const now = Date.now();
+  const url = new URL(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(id)}/events`);
+  url.search = new URLSearchParams({
+    key: apiKey,
+    singleEvents: "true", // expand weekly meetings into separate occurrences
+    orderBy: "startTime", // requires singleEvents
+    // A wide window; the "today in Chicago" filter happens below
+    timeMin: new Date(now - 12 * 60 * 60 * 1000).toISOString(),
+    timeMax: new Date(now + 36 * 60 * 60 * 1000).toISOString(),
+    maxResults: "50",
+  }).toString();
+
+  const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
+  // Never log the URL: it contains the API key
+  if (!res.ok) throw new Error(`Google Calendar HTTP ${res.status} for ${CALENDARS[id].label}`);
+  const data = (await res.json()) as GoogleEventList;
+
+  const { label, color } = CALENDARS[id];
+  return (data.items ?? [])
+    .filter((e: GoogleEvent) => e.status !== "cancelled" && e.summary)
+    .map((e: GoogleEvent) => ({
+      title: e.summary ?? "",
+      start: e.start.dateTime ?? e.start.date ?? "",
+      end: e.end.dateTime ?? e.end.date ?? "",
+      allDay: !e.start.dateTime,
+      location: e.location,
+      label,
+      color,
+    }));
+}
+
+function isToday(e: CalEvent, now: Date): boolean {
+  const today = chicagoDate.format(now);
+  if (e.allDay) return e.start <= today && today < e.end; // end is the day after
+  const start = new Date(e.start);
+  const end = new Date(e.end);
+  return chicagoDate.format(start) === today || (start <= now && now < end);
+}
+
+// One cached fetcher per set of calendars (the clock always asks for the same set)
+const fetchers = new Map<string, () => Promise<CalEvent[]>>();
+
+async function getEvents(requestedIds: string[]): Promise<CalEvent[]> {
+  const apiKey = process.env.GOOGLE_API_KEY;
+  if (!apiKey) return []; // no key yet: the panel hides itself
+
+  const ids = requestedIds.filter((id) => id in CALENDARS);
+  if (ids.length === 0) return [];
+
+  const cacheKey = ids.join(",");
+  let fetchAll = fetchers.get(cacheKey);
+  if (!fetchAll) {
+    fetchAll = cached(async () => {
+      const results = await Promise.allSettled(ids.map((id) => fetchCalendar(id, apiKey)));
+      const events: CalEvent[] = [];
+      for (const r of results) {
+        if (r.status === "fulfilled") events.push(...r.value);
+        else console.error("Calendar fetch failed:", r.reason);
+      }
+      if (events.length === 0 && results.every((r) => r.status === "rejected")) {
+        throw new Error("All calendar requests failed");
+      }
+      return events;
+    }, 10);
+    fetchers.set(cacheKey, fetchAll);
+  }
+
+  const now = new Date();
+  return (await fetchAll())
+    .filter((e) => isToday(e, now))
+    .sort((a, b) => Number(b.allDay) - Number(a.allDay) || a.start.localeCompare(b.start));
+}
+
+export default getEvents;

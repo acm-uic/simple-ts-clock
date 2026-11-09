@@ -1,4 +1,5 @@
 import type { Weather } from "../src/util/weatherTypes";
+import { loadEvents } from "./events";
 import { showWeather } from "./weatherEffects";
 import type { Arrival, ArrivalGroup } from "../src/util/transitTypes";
 interface StringIndexes {
@@ -88,6 +89,8 @@ export async function getData() {
       console.error("Transit update failed:", err);
     }
   })();
+
+  loadEvents(config.eventCalendars ?? "");
 
   (async () => {
     try {
