@@ -4,10 +4,13 @@ A simple, maybe not so simple clock replacement for the office of ACM@UIC.
 
 ## Features
 
-* Time and Date
-* CTA Bus and Train Arrival Times
-* Weather from DarkSky
-* QR Codes for ACM and LUG Discords
+* Time and date (Chicago time)
+* Weather from the National Weather Service, in °F and °C, with rain, snow, lightning, clouds, and day/night sky effects
+* CTA bus and train arrivals, grouped by line and direction, with delay, schedule-only, and crowding flags
+* Today's ACM and LUG events from their public Google Calendars
+* Event flyers from a shared Google Drive folder (see [How to add a flyer](#how-to-add-a-flyer))
+* A ticker with NWS weather alerts, CTA service alerts, and recent GitHub activity
+* QR codes for the ACM and LUG Discords
 
 # Building and deployment
 
@@ -47,6 +50,14 @@ Demo mode works like offline mode but displays demo information instead of real 
 
 ### Configuration
 To override the default config, you can use the URL GET parameters or by pressing `c` to open the config options.
+
+Where settings live:
+* **Secrets** (API keys) go in `.env` locally, and in `enc.env` on the clock. See `.env.example` for the list: `CTA_BUS_API_KEY`, `CTA_TRAIN_API_KEY`, `GOOGLE_API_KEY`, and the optional `GITHUB_TOKEN`.
+* **Page settings** (bus stops, train stations, weather location, calendars) are in `defaultConfig` in `src/controllers/homeController.ts`.
+* **Server-only settings** are constants at the top of the matching `src/util/get*.ts` file: the calendars (`getEvents.ts`), the flyers folder (`getFlyers.ts`), and the ticker's CTA routes and GitHub orgs (`getMessages.ts`).
+* Panels with no data (or no key yet) are skipped, so a missing key never breaks the page.
+
+For testing, `?wx=clear|cloudy|rain|snow|storm|fog`, `?wxi=light|normal|heavy`, and `?wxtime=night` force the weather effects.
 
 ### How to add a flyer
 The flyers panel shows images from the shared [Put Clock Flyers Here](https://drive.google.com/drive/folders/1P5ww7kSd9eH6Cc_kTazQcaO-fGglCUgy) Drive folder, one per rotation.

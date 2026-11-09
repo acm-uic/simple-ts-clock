@@ -1,5 +1,8 @@
 import { getData, renderGroups } from "./getData";
 import "@fontsource/montserrat";
+// Icons from the installed package, not a CDN, so they load even if the network is slow at boot
+import "@fortawesome/fontawesome-free/css/fontawesome.css";
+import "@fortawesome/fontawesome-free/css/solid.css";
 import "./main.css";
 import { type Panel, startRotator } from "./rotator";
 import type { CalEvent } from "../src/util/calendarTypes";
