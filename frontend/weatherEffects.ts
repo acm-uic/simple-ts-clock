@@ -139,6 +139,7 @@ export function startWeatherEffects(): void {
     night?.classList.toggle("is-visible", !isDay);
     sky.style.setProperty("--cloudiness", String(CLOUDS_FOR[next].amount));
     sky.style.setProperty("--cloud-rgb", CLOUDS_FOR[next].rgb);
+    start();
   }
 
   function lightning(seconds: number): void {
@@ -175,6 +176,16 @@ export function startWeatherEffects(): void {
   }
 
   let lastTime = performance.now();
+  let running = false;
+
+  // The drawing loop runs only while there is rain or snow to draw (a storm always
+  // has rain). On a clear, cloudy or foggy day it stops, and the canvas costs nothing.
+  function start(): void {
+    if (running) return;
+    running = true;
+    lastTime = performance.now();
+    requestAnimationFrame(frame);
+  }
 
   function frame(now: number): void {
     const seconds = Math.min(0.1, (now - lastTime) / 1000);
@@ -184,23 +195,27 @@ export function startWeatherEffects(): void {
     ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
     ctx.lineWidth = 1.5;
     ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+    // Every particle goes into one path, drawn with a single call
+    ctx.beginPath();
     for (const p of particles) {
       p.y += p.speed * seconds;
       p.x += p.drift * seconds;
       if (p.y > height) Object.assign(p, makeParticle(false));
-      ctx.beginPath();
       if (effect === "snow") {
+        ctx.moveTo(p.x + p.size, p.y); // start on the circle's edge, so no line joins it to the last one
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
       } else {
         ctx.moveTo(p.x, p.y);
         ctx.lineTo(p.x - 2, p.y + p.size);
-        ctx.stroke();
       }
     }
+    if (effect === "snow") ctx.fill();
+    else ctx.stroke();
     lightning(seconds);
 
-    requestAnimationFrame(frame);
+    // Nothing left to draw: this last frame cleared the canvas, so stop here
+    running = particles.length > 0;
+    if (running) requestAnimationFrame(frame);
   }
 
   const params = new URLSearchParams(window.location.search);
@@ -213,8 +228,6 @@ export function startWeatherEffects(): void {
     if (forced) return; // ?wx= overrides the real weather while testing
     applyCondition(w.condition, w.intensity, w.isDay);
   };
-
-  requestAnimationFrame(frame);
 
   window.addEventListener("resize", () => {
     ctx = fitCanvas(canvas);

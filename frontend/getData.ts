@@ -1,13 +1,12 @@
+import type { Arrival, ArrivalGroup } from "../src/util/transitTypes";
 import type { Weather } from "../src/util/weatherTypes";
+import { escapeHtml } from "./escapeHtml";
 import { loadEvents } from "./events";
 import { loadFlyers } from "./flyers";
+import { load } from "./load";
 import { showWeather } from "./weatherEffects";
-import type { Arrival, ArrivalGroup } from "../src/util/transitTypes";
-interface StringIndexes {
-  [key: string]: string;
-}
 
-const ctaRouteColors: StringIndexes = {
+const ctaRouteColors: Record<string, string> = {
   // TODO: Pick Better Colors
   Red: "#c10000",
   Blue: "#03396c",
@@ -18,24 +17,6 @@ const ctaRouteColors: StringIndexes = {
   P: "#866ec7",
   Y: "#e4c666",
 };
-export interface Config {
-  ctaBusStops?: string[];
-  ctaTrainStations?: string[];
-  weatherLatLong?: string;
-  eventCalendars?: string[];
-}
-
-export function clearData(elementSelector?: string): void {
-  if (!elementSelector) {
-    document.getElementById("bus")!.innerHTML = "";
-    document.getElementById("train")!.innerHTML = "";
-    document.getElementById("weather")!.innerHTML = "";
-    document.getElementById("events")!.innerHTML = "";
-    document.getElementById("messages")!.innerHTML = "";
-  } else {
-    document.querySelector(elementSelector)!.innerHTML = "";
-  }
-}
 
 // One arrival: "Due" or "7m", plus its flags
 function renderArrival(a: Arrival): string {
@@ -54,8 +35,8 @@ function renderArrival(a: Arrival): string {
 function renderGroup(g: ArrivalGroup): string {
   const color = ctaRouteColors[g.route] ?? "";
   return `<li class="group">
-    <span class="route icon" style="background-color:${color}">${g.route}</span>
-    <span class="direction">${g.direction}</span>
+    <span class="route icon" style="background-color:${color}">${escapeHtml(g.route)}</span>
+    <span class="direction">${escapeHtml(g.direction)}</span>
     ${g.arrivals.map(renderArrival).join("")}
   </li>`;
 }
@@ -67,43 +48,17 @@ export function renderGroups(groups: ArrivalGroup[], mode: "bus" | "train"): str
     .join("");
 }
 
-export async function getData() {
-  const { origin } = window.location;
-  const urlParams = new URLSearchParams(window.location.search);
-  const config = {
-    ctaBusStops: urlParams.get("ctaBusStops"),
-    ctaTrainStations: urlParams.get("ctaTrainStations"),
-    weatherLatLong: urlParams.get("weatherLatLong"),
-    eventCalendars: urlParams.get("eventCalendars"),
-  };
-
-  (async () => {
-    try {
-      const res = await fetch(
-        `${origin}/api/transit?bus=${config.ctaBusStops ?? ""}&train=${config.ctaTrainStations ?? ""}`,
-      );
-      if (!res.ok) return; // keep whatever is on screen
-      const groups: ArrivalGroup[] = await res.json();
-      document.getElementById("train")!.innerHTML = renderGroups(groups, "train");
-      document.getElementById("bus")!.innerHTML = renderGroups(groups, "bus");
-    } catch (err) {
-      console.error("Transit update failed:", err);
-    }
-  })();
-
-  loadEvents(config.eventCalendars ?? "");
+export function getData(): void {
+  load<ArrivalGroup[]>("transit", (groups) => {
+    document.getElementById("train")!.innerHTML = renderGroups(groups, "train");
+    document.getElementById("bus")!.innerHTML = renderGroups(groups, "bus");
+  });
+  load<Weather>("weather", (w) => {
+    const estimate = w.source === "forecast" ? " (est.)" : "";
+    document.getElementById("weather")!.innerHTML =
+      `<p>${escapeHtml(w.description)}${estimate}</p><p>${w.tempF} &#176;F | ${w.tempC} &#176;C</p>`;
+    showWeather(w);
+  });
+  loadEvents();
   loadFlyers();
-
-  (async () => {
-    try {
-      const res = await fetch(`${origin}/api/weather?weatherLatLong=${config.weatherLatLong}`);
-      if (!res.ok) return; // keep whatever is on screen
-      const w: Weather = await res.json();
-      const html = `<p>${w.description}${w.source === "forecast" ? " (est.)" : ""}</p><p>${w.tempF} &#176;F | ${w.tempC} &#176;C</p>`;
-      document.getElementById("weather")!.innerHTML = html;
-      showWeather(w);
-    } catch (err) {
-      console.error("Weather update failed:", err);
-    }
-  })();
 }

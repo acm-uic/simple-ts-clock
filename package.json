@@ -8,15 +8,9 @@
   },
   "files": ["./dist/*", "./views/*"],
   "scripts": {
-    "clean": "rimraf ./dist/",
-    "build": "npm run build-ts && vite build && npm run generate:qr",
-    "dev": "vite build && npm run generate:qr && ts-node ./src/server.ts",
-    "generate:qr": "ts-node ./scripts/generate-qr.ts",
-    "build-ts": "tsc",
-    "watch-ts": "tsc -w",
-    "watch-node": "nodemon ./dist/server.js",
-    "start": "node ./dist/server.js",
-    "watch-server": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\""
+    "build": "tsc && tsc -p frontend && vite build",
+    "dev": "vite build && ts-node ./src/server.ts",
+    "start": "node ./dist/server.js"
   },
   "repository": {
     "type": "git",
@@ -30,31 +24,16 @@
   "homepage": "https://github.com/bmiddha/simple-js-clock#readme",
   "dependencies": {
     "@fontsource/montserrat": "^5.2.8",
-    "@fortawesome/fontawesome-free": "^6.7.2",
-    "apicache": "^1.6.3",
-    "body-parser": "^1.20.3",
     "compression": "^1.8.0",
-    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "googleapis": "^144.0.0",
-    "path": "^0.12.7",
     "pug": "^3.0.3"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.5",
-    "@types/apicache": "^1.6.7",
-    "@types/body-parser": "^1.19.5",
     "@types/compression": "^1.7.5",
-    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.1",
-    "@types/qrcode": "^1.5.5",
-    "concurrently": "^9.1.2",
-    "nodemon": "^3.1.9",
-    "qrcode": "^1.5.4",
-    "rimraf": "^6.0.1",
-    "sharp": "^0.34.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
     "vite": "^7.1.9"

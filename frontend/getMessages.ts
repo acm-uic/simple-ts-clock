@@ -58,10 +58,8 @@ document.getElementById("messages")?.addEventListener("animationiteration", () =
 });
 
 export async function getMessages(): Promise<void> {
-  const { origin } = window.location;
-  const latLong = new URLSearchParams(window.location.search).get("weatherLatLong") ?? "";
   try {
-    const res = await fetch(`${origin}/api/messages?weatherLatLong=${latLong}`);
+    const res = await fetch("/api/messages");
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const items: TickerItem[] = await res.json();
     show(renderTicker(items));

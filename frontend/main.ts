@@ -1,44 +1,30 @@
-import { getData, renderGroups } from "./getData";
-import "@fontsource/montserrat";
-// Icons from the installed package, not a CDN, so they load even if the network is slow at boot
-import "@fortawesome/fontawesome-free/css/fontawesome.css";
-import "@fortawesome/fontawesome-free/css/solid.css";
+// Only the Latin letters, in the three weights the page uses (regular, semi-bold, bold)
+import "@fontsource/montserrat/latin-400.css";
+import "@fontsource/montserrat/latin-600.css";
+import "@fontsource/montserrat/latin-700.css";
 import "./main.css";
-import { type Panel, startRotator } from "./rotator";
 import type { CalEvent } from "../src/util/calendarTypes";
+import { chicagoDate } from "../src/util/chicagoDate";
 import type { TickerItem } from "../src/util/tickerTypes";
 import type { Arrival, ArrivalGroup } from "../src/util/transitTypes";
 import { renderEvents } from "./events";
 import { flyersReady, setFlyers, showNextFlyer } from "./flyers";
+import { getData, renderGroups } from "./getData";
 import { fitTicker, getMessages, renderTicker } from "./getMessages";
+import { type Panel, startRotator } from "./rotator";
 import { startWeatherEffects } from "./weatherEffects";
 
 const timeElement = document.getElementById("time")!;
 const dateElement = document.getElementById("date")!;
-const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-const timeFormat = new Intl.DateTimeFormat("en-US", {
+// Time and date are both Chicago's, whatever the machine's own time zone is
+const clockFormat = new Intl.DateTimeFormat("en-US", {
   timeZone: "America/Chicago",
   hour: "2-digit",
   minute: "2-digit",
+  weekday: "long",
+  month: "long",
+  day: "2-digit",
 });
-
-interface StringIndexes {
-  [key: string]: string;
-}
 
 // Small helper so each demo arrival is one line
 const demoArrival = (minutes: number | "due", flags: Partial<Arrival> = {}): Arrival => ({
@@ -93,11 +79,10 @@ const demoTicker: TickerItem[] = [
 // Demo events relative to now, so "happening now" and "finished" always show
 const HOUR = 60 * 60 * 1000;
 const at = (hoursFromNow: number) => new Date(Date.now() + hoursFromNow * HOUR).toISOString();
-const todayChicago = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date());
 const demoEvents: CalEvent[] = [
   {
     title: "Fall Hackathon Signups",
-    start: todayChicago,
+    start: chicagoDate(),
     end: "9999-12-31",
     allDay: true,
     label: "ACM",
@@ -133,7 +118,7 @@ const demoEvents: CalEvent[] = [
   { title: "Game Dev User Group", start: at(4), end: at(5.5), allDay: false, label: "LUG", color: "#2e8b57" },
 ];
 
-const demoData: StringIndexes = {
+const demoData: Record<string, string> = {
   bus: renderGroups(demoTransit, "bus"),
   train: renderGroups(demoTransit, "train"),
   weather: "<p>Mostly Clear (est.)</p><p>61 &#176;F | 16 &#176;C</p>",
@@ -142,13 +127,9 @@ const demoData: StringIndexes = {
 };
 
 function updateTime(): void {
-  const now = new Date();
-  const nowFormat = timeFormat.formatToParts(now);
-  const hour = nowFormat.find((p) => p.type === "hour")?.value;
-  const min = nowFormat.find((p) => p.type === "minute")?.value;
-  const date = now.getDate().toString().padStart(2, "0");
-  timeElement.innerHTML = `${hour}:${min}`;
-  dateElement.innerHTML = `${days[now.getDay()]} | ${months[now.getMonth()]} ${date}`;
+  const now = Object.fromEntries(clockFormat.formatToParts(new Date()).map((p) => [p.type, p.value]));
+  timeElement.textContent = `${now.hour}:${now.minute}`;
+  dateElement.textContent = `${now.weekday} | ${now.month} ${now.day}`;
 }
 
 window.onload = (): void => {
@@ -220,24 +201,11 @@ window.onload = (): void => {
 
   startRotator(panels, document.getElementById("fallback")!);
 
+  // "R" on a keyboard reloads the page
   window.onkeydown = (e: KeyboardEvent): void => {
-    switch (e.code) {
-      case "KeyR":
-        window.location.reload();
-        break;
-      case "KeyD":
-        if (confirm("Are you sure that you want to load the default configuration?")) window.location.pathname = "/";
-        break;
-      case "KeyC":
-        document.getElementById("config").style.display = "block";
-        break;
-      case "Escape":
-        document.getElementById("config").style.display = "none";
-        break;
-    }
+    if (e.code === "KeyR") window.location.reload();
   };
 
-  setInterval((): void => {
-    window.location.reload();
-  }, 7200000);
+  // A fresh start every 2 hours picks up new deploys and clears anything that has built up
+  setInterval(() => window.location.reload(), 2 * 60 * 60 * 1000);
 };
