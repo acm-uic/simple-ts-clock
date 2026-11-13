@@ -23,6 +23,17 @@ const CLOUDS_FOR: Record<Condition, { amount: number; rgb: string }> = {
   fog: { amount: 0.4, rgb: "230, 232, 235" },
 };
 
+// Particles per million square pixels of sky, so rain and snow look equally
+// dense on any screen size
+const RAIN_PER_MEGAPIXEL = 220;
+const SNOW_PER_MEGAPIXEL = 175;
+
+// Rain and snow are full strength in the top of the screen and dimmer behind
+// the panels, so they never compete with the text in front of them.
+const DIM_FROM = 0.2; // dimming starts this far down the screen (0 to 1)
+const DIM_BY = 0.34; // ...and is complete by here, just above the panels
+const DIM_TO = 0.45; // how strong particles are below that (1 = same as the top)
+
 const AMOUNT_FOR: Record<Intensity, number> = {
   light: 0.5, // half the particles
   normal: 1,
@@ -38,6 +49,7 @@ const FLICKER_PEAK = 0.15; // the optional second flicker is weaker
 const FLICKER_CHANCE = 1 / 3; // how often a strike flickers twice
 const FLICKER_DELAY_S = 0.4; // gap between strike and flicker
 const FLASH_FADE_S = 0.3; // how long a flash takes to fade from peak to 0
+const FLASH_REACH = 0.6; // how far down the screen a flash reaches (0 to 1); it fades out toward that point
 
 interface Particle {
   x: number;
@@ -82,6 +94,18 @@ export function startWeatherEffects(): void {
     return STRIKE_MIN_S + Math.random() * (STRIKE_MAX_S - STRIKE_MIN_S);
   }
 
+  // A white that is `alpha` strong at the top and dimmer lower down (see DIM_*)
+  function fadingWhite(alpha: number): CanvasGradient {
+    const g = ctx.createLinearGradient(0, 0, 0, height);
+    g.addColorStop(0, `rgba(255, 255, 255, ${alpha})`);
+    g.addColorStop(DIM_FROM, `rgba(255, 255, 255, ${alpha})`);
+    g.addColorStop(DIM_BY, `rgba(255, 255, 255, ${alpha * DIM_TO})`);
+    g.addColorStop(1, `rgba(255, 255, 255, ${alpha * DIM_TO})`);
+    return g;
+  }
+  let rainStyle = fadingWhite(0.5);
+  let snowStyle = fadingWhite(0.8);
+
   let flash = 0;
   let untilStrike = randomGap();
   let untilFlicker: number | undefined;
@@ -109,8 +133,11 @@ export function startWeatherEffects(): void {
     };
   }
 
-  function setEffect(next: Effect, amount = 1): void {
-    const count = Math.round((next === "rain" ? 150 : next === "snow" ? 120 : 0) * amount);
+  let amount = 1; // remembered so a resize can recount the particles
+  function setEffect(next: Effect, nextAmount = 1): void {
+    const perMegapixel = next === "rain" ? RAIN_PER_MEGAPIXEL : next === "snow" ? SNOW_PER_MEGAPIXEL : 0;
+    const count = Math.round((perMegapixel * nextAmount * width * height) / 1_000_000);
+    amount = nextAmount;
     if (next === effect && count === particles.length) return;
     effect = next;
     particles = Array.from({ length: count }, () => makeParticle(true));
@@ -167,10 +194,15 @@ export function startWeatherEffects(): void {
       }
     }
 
-    // 4. Draw the flash, then fade it
+    // 4. Draw the flash, then fade it. The flash is brightest at the top and
+    //    fades out part-way down, so it lights the sky and not the panels.
     if (flash > 0) {
-      ctx.fillStyle = `rgba(255, 255, 255, ${flash})`;
-      ctx.fillRect(0, 0, width, height);
+      const reach = height * FLASH_REACH;
+      const glow = ctx.createLinearGradient(0, 0, 0, reach);
+      glow.addColorStop(0, `rgba(255, 255, 255, ${flash})`);
+      glow.addColorStop(1, "rgba(255, 255, 255, 0)");
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, width, reach);
       flash = Math.max(0, flash - (FLASH_PEAK / FLASH_FADE_S) * seconds);
     }
   }
@@ -192,9 +224,9 @@ export function startWeatherEffects(): void {
     lastTime = now;
 
     ctx.clearRect(0, 0, width, height);
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.5)";
+    ctx.strokeStyle = rainStyle;
     ctx.lineWidth = 1.5;
-    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+    ctx.fillStyle = snowStyle;
     // Every particle goes into one path, drawn with a single call
     ctx.beginPath();
     for (const p of particles) {
@@ -232,5 +264,9 @@ export function startWeatherEffects(): void {
   window.addEventListener("resize", () => {
     ctx = fitCanvas(canvas);
     ({ width, height } = canvas.getBoundingClientRect());
+    rainStyle = fadingWhite(0.5); // the gradients belong to the old size
+    snowStyle = fadingWhite(0.8);
+    setEffect(effect, amount); // same density on the new size
+    start();
   });
 }
