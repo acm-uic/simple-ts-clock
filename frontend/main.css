@@ -195,25 +195,13 @@ body {
   }
 }
 
+/* The sky fills the whole screen, behind everything else: z-index -1 puts it
+   under the content, and the wrapper's "isolation" keeps it above the page
+   background. Its children below are placed relative to it. */
 #sky {
-  grid-row: 1 / 4;
-  grid-column: 1 / -1;
-  z-index: -1;
-  position: relative; /* children below are placed relative to the sky */
-  /* Bleed past the wrapper's 25px padding so the sky reaches the screen edges */
-  margin: -25px -25px 0;
-}
-/* Divider: a bar along the sky's bottom edge, so the tint, clouds, and rain
-   end on a deliberate line instead of being cut off above the panels. */
-#sky::after {
-  content: "";
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.6);
-  pointer-events: none;
+  inset: 0;
+  z-index: -1;
 }
 #sky-canvas {
   position: relative; /* drawn above the absolutely placed layers before it */
@@ -239,7 +227,10 @@ body {
     opacity: 1;
   }
 }
-/* Semi-transparent, so the page's animated gradient still shows through */
+/* Semi-transparent, so the page's animated gradient still shows through.
+   The sky is behind the panels too, so the tints that lighten the background
+   (snow, fog) thin out by a third of the way down, where the panels start,
+   so white text stays readable. */
 .sky-clear {
   background: linear-gradient(to bottom, rgba(70, 150, 230, 0.25), transparent);
 }
@@ -253,10 +244,20 @@ body {
   background: linear-gradient(to bottom, rgba(30, 35, 50, 0.65), rgba(30, 35, 50, 0.25));
 }
 .sky-snow {
-  background: linear-gradient(to bottom, rgba(200, 210, 225, 0.35), rgba(200, 210, 225, 0.1));
+  background: linear-gradient(
+    to bottom,
+    rgba(200, 210, 225, 0.35),
+    rgba(200, 210, 225, 0.05) 33%,
+    rgba(200, 210, 225, 0.03)
+  );
 }
 .sky-fog {
-  background: rgba(210, 215, 220, 0.45);
+  background: linear-gradient(
+    to bottom,
+    rgba(210, 215, 220, 0.45),
+    rgba(210, 215, 220, 0.06) 33%,
+    rgba(210, 215, 220, 0.04)
+  );
 }
 /* Night darkens whatever the condition is */
 .sky-night {
@@ -271,6 +272,12 @@ body {
 /* Clouds: soft radial-gradient blobs drifting slowly. JS sets --cloudiness
    (how visible) and --cloud-rgb (white, grey, or dark) from the condition. */
 .clouds {
+  /* Clouds stay in the top part of the screen and fade out at the bottom of
+     that band (the mask), so they never sit behind the panels or end in a hard edge. */
+  bottom: auto;
+  height: 40%;
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent);
   overflow: hidden;
   opacity: var(--cloudiness, 0.2);
   transition: opacity 3s ease;
@@ -319,6 +326,7 @@ body {
 .wrapper {
   padding: 25px;
   isolation: isolate;
+  position: relative; /* the full-screen sky is placed relative to this */
 }
 
 .wrapper > * {
