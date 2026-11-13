@@ -33,6 +33,10 @@ const demoData: StringIndexes = {
     '<ul><li class="event happeningNow"><div class=eventName><span>Test Event 1</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 2</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 3</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 4</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 5</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 6</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 7</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 8</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div></ul>',
 };
 
+// biome-ignore lint/style/noNonNullAssertion: Config element is always present
+const configElement = document.getElementById("config")!;
+const switcherElement = document.querySelector("#switcher")!;
+
 function updateTime(): void {
   const now = new Date();
   const hour = now.getHours();
@@ -67,13 +71,13 @@ window.onload = (): void => {
         if (!element) {
           const div = document.createElement("div");
           div.setAttribute("id", key);
-          document.querySelector("#switcher")!.appendChild(div);
+          switcherElement.appendChild(div);
           element = document.getElementById(`${key}`)!;
         }
         element.innerHTML = demoData[key];
       }
     case "offline":
-      document.getElementById(`${mode}Mode`)!.style.display = "block";
+      document.getElementById(`${mode}Mode`)!.style.display = "block"; //figure out how to throw an error
       break;
     default:
       getData();
@@ -95,10 +99,10 @@ window.onload = (): void => {
         if (confirm("Are you sure that you want to load the default configuration?")) window.location.pathname = "/";
         break;
       case "KeyC":
-        document.getElementById("config").style.display = "block";
+        configElement.style.display = "block";
         break;
       case "Escape":
-        document.getElementById("config").style.display = "none";
+        configElement.style.display = "none";
         break;
     }
   };
