@@ -27,7 +27,8 @@ app.use(compression());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(express.static(path.join("dist", "public"), { maxAge: 0 }));
+// Relative to this file, not the working directory: systemd starts the server from "/"
+app.use(express.static(path.join(__dirname, "../dist/public"), { maxAge: 0 }));
 // Registered before the cache below: flyer images set their own 1-hour browser cache,
 // which apicache would otherwise replace with 1 minute.
 app.get("/api/flyers/:id", flyersController.flyerImage);
