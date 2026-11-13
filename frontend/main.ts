@@ -7,6 +7,7 @@ import type { CalEvent } from "../src/util/calendarTypes";
 import { chicagoDate } from "../src/util/chicagoDate";
 import type { TickerItem } from "../src/util/tickerTypes";
 import type { Arrival, ArrivalGroup } from "../src/util/transitTypes";
+import { scrollToFit } from "./autoScroll";
 import { renderEvents } from "./events";
 import { flyersReady, setFlyers, showNextFlyer } from "./flyers";
 import { getData, renderGroups } from "./getData";
@@ -169,12 +170,28 @@ window.onload = (): void => {
 
   const PANEL_MS = 10_000;
 
+  // A transit list too tall for its panel slides down to show the rest, and the
+  // panel's turn then lasts one full pass. Re-measured whenever the list or the
+  // panel changes size (new arrivals, a resized window, a font finishing loading).
+  const transit = document.getElementById("transit")!;
+  const transitList = document.getElementById("cta")!;
+  let transitMs = PANEL_MS;
+  const fitTransit = (restart = false): void => {
+    transitMs = scrollToFit(transit, transitList, PANEL_MS, restart) || PANEL_MS;
+  };
+  const transitSize = new ResizeObserver(() => fitTransit());
+  transitSize.observe(transit);
+  transitSize.observe(transitList);
+
   const panels: Panel[] = [
     {
       id: "transit",
-      el: document.getElementById("transit")!,
-      durationMs: PANEL_MS,
+      el: transit,
+      get durationMs() {
+        return transitMs;
+      },
       isReady: () => document.querySelector("#bus li, #train li") !== null,
+      refresh: () => fitTransit(true), // back on screen: start from the top
     },
   ];
 
