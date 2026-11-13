@@ -1,8 +1,7 @@
-import dotenv from "dotenv";
 import { cached } from "./cached";
+import { chicagoDate } from "./chicagoDate";
+import { fetchJson } from "./fetchJson";
 import type { Flyer } from "./flyerTypes";
-
-dotenv.config();
 
 // The public Drive folder officers drop flyers into. The server decides the
 // folder (not the query string), so the key can't be pointed at other folders.
@@ -15,22 +14,12 @@ interface DriveFile extends Flyer {
   size?: string;
 }
 
-// "2026-11-09" in Chicago; text in this form compares correctly
-const chicagoDate = new Intl.DateTimeFormat("en-CA", {
-  timeZone: "America/Chicago",
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-});
-
 // A flyer named "11-11-26 Talk.png" or "2026-11-11 Talk.png" expires after that day.
 // Gives back "2026-11-11", or undefined when the name doesn't start with a date.
 function dateFromName(name: string): string | undefined {
   const us = name.match(/^(\d{2})-(\d{2})-(\d{2})\b/); // MM-DD-YY
   if (us) return `20${us[3]}-${us[1]}-${us[2]}`;
-  const iso = name.match(/^(\d{4})-(\d{2})-(\d{2})\b/); // YYYY-MM-DD
-  if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
-  return undefined;
+  return name.match(/^\d{4}-\d{2}-\d{2}\b/)?.[0]; // YYYY-MM-DD
 }
 
 function driveUrl(path: string, params: Record<string, string>): URL {
@@ -52,19 +41,12 @@ async function fetchFlyerList(): Promise<Flyer[]> {
     orderBy: "name",
     pageSize: "100",
   });
-  const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
-  // Never log the URL: it contains the API key
-  if (!res.ok) throw new Error(`Google Drive list HTTP ${res.status}`);
-  const data = (await res.json()) as { files?: DriveFile[] };
+  const data = await fetchJson<{ files?: DriveFile[] }>(url, "Google Drive list");
 
-  const today = chicagoDate.format(new Date());
+  const today = chicagoDate();
   return (data.files ?? [])
-    .filter((f) => SHOWABLE.includes(f.mimeType))
-    .filter((f) => Number(f.size ?? 0) <= MAX_BYTES)
-    .filter((f) => {
-      const date = dateFromName(f.name);
-      return date === undefined || date >= today; // shown through its date
-    })
+    .filter((f) => SHOWABLE.includes(f.mimeType) && Number(f.size ?? 0) <= MAX_BYTES)
+    .filter((f) => (dateFromName(f.name) ?? today) >= today) // shown through its date; no date never expires
     .map(({ id, name, mimeType }) => ({ id, name, mimeType }));
 }
 

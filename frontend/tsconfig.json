@@ -1,0 +1,14 @@
+{
+  // Type-checks the page's code. Vite builds it but does not check types.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": []
+  },
+  "include": ["**/*.ts", "../src/util/*Types.ts", "../src/util/chicagoDate.ts"]
+}

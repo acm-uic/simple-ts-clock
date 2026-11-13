@@ -32,14 +32,11 @@ can be run as follows:
 1. Clone the repository.
 2. Navigate to the repository directory.
 3. Create a `.env` file based on `.env.example`.
-4. Optionally modify the values (not the keys) of `src/qrCodeUrls.ts` to point to up-to-date URLs for the Discord and the repository for this project, if they've changed. Please commit those changes.
-4. Run `npm install` to install dependencies. (See [CONTRIBUTING.md](CONTRIBUTING.md) for detail about how to install dependencies when changing the set of dependencies.)
+4. Run `npm install` to install dependencies. (See [CONTRIBUTING.md](CONTRIBUTING.md) before changing the set of dependencies.)
 5. Run `npm run dev`.
+6. Open `localhost:8080` in a browser (or the port set in `.env`).
 
-### How to use
-
-1. Run `npm run start` to start the npm server or `npm run watch` to watch for changes.
-2. Navigate the browser to `locahost:8080` or the port specified in the `.env` config.
+`npm run build` type-checks and builds everything into `dist/`, and `npm start` runs that build.
 
 ### Offline Mode
 
@@ -49,15 +46,14 @@ Offline mode will disable api requests to the server leaving only the clock runn
 Demo mode works like offline mode but displays demo information instead of real data from apis. It can be activated by going to `/demo` path.
 
 ### Configuration
-To override the default config, you can use the URL GET parameters or by pressing `c` to open the config options.
+Settings are constants in the code. There are no URL parameters or settings screen.
 
-Where settings live:
 * **Secrets** (API keys) go in `.env` locally, and in `enc.env` on the clock. See `.env.example` for the list: `CTA_BUS_API_KEY`, `CTA_TRAIN_API_KEY`, `GOOGLE_API_KEY`, and the optional `GITHUB_TOKEN`.
-* **Page settings** (bus stops, train stations, weather location, calendars) are in `defaultConfig` in `src/controllers/homeController.ts`.
-* **Server-only settings** are constants at the top of the matching `src/util/get*.ts` file: the calendars (`getEvents.ts`), the flyers folder (`getFlyers.ts`), and the ticker's CTA routes and GitHub orgs (`getMessages.ts`).
+* **What the clock shows** is set at the top of the matching `src/util/get*.ts` file: bus stops and train stations (`getTransit.ts`), the weather location (`getWeather.ts`), the calendars (`getEvents.ts`), the flyers folder (`getFlyers.ts`), and the ticker's CTA routes and GitHub orgs (`getMessages.ts`).
+* **The Discord QR codes** are the images in `frontend/public/qr/`, and the links behind them are in `src/qrCodeUrls.ts`. If an invite changes, update the link and replace the image, for example with `npx qrcode -e H -o frontend/public/qr/acmDiscord.png <new link>`.
 * Panels with no data (or no key yet) are skipped, so a missing key never breaks the page.
 
-For testing, `?wx=clear|cloudy|rain|snow|storm|fog`, `?wxi=light|normal|heavy`, and `?wxtime=night` force the weather effects.
+For testing, `?wx=clear|cloudy|rain|snow|storm|fog`, `?wxi=light|normal|heavy`, and `?wxtime=night` force the weather effects. Pressing `R` on a keyboard reloads the page.
 
 ### How to add a flyer
 The flyers panel shows images from the shared [Put Clock Flyers Here](https://drive.google.com/drive/folders/1P5ww7kSd9eH6Cc_kTazQcaO-fGglCUgy) Drive folder, one per rotation.

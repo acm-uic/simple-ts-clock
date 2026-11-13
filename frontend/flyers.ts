@@ -1,5 +1,6 @@
 import type { Flyer } from "../src/util/flyerTypes";
 import { escapeHtml } from "./escapeHtml";
+import { load } from "./load";
 
 interface ShownFlyer {
   url: string;
@@ -34,13 +35,7 @@ export function showNextFlyer(): void {
   if (next !== flyer) new Image().src = next.url;
 }
 
-export async function loadFlyers(): Promise<void> {
-  try {
-    const res = await fetch(`${window.location.origin}/api/flyers`);
-    if (!res.ok) return; // keep the current list
-    const list: Flyer[] = await res.json();
-    setFlyers(list.map((f) => ({ url: `/api/flyers/${encodeURIComponent(f.id)}`, name: f.name })));
-  } catch (err) {
-    console.error("Flyer list update failed:", err);
-  }
-}
+export const loadFlyers = (): Promise<void> =>
+  load<Flyer[]>("flyers", (list) =>
+    setFlyers(list.map((f) => ({ url: `/api/flyers/${encodeURIComponent(f.id)}`, name: f.name }))),
+  );

@@ -1,50 +1,40 @@
+import { cached } from "./cached";
+import { fetchJson } from "./fetchJson";
 import type {
   Condition,
   Intensity,
-  NwsPoints,
-  NwsStations,
-  NwsObservation,
-  NwsPresentWeather,
-  Weather,
   NwsForecastPeriod,
   NwsHourlyForecast,
+  NwsObservation,
+  NwsPoints,
+  NwsPresentWeather,
+  NwsStations,
+  Weather,
 } from "./weatherTypes";
-import { cached } from "./cached";
+
+// Where the clock is: "latitude,longitude" (NWS allows at most 4 decimals)
+export const WEATHER_LAT_LONG = "41.8659,-87.6482";
 
 const THICK_CLOUDS = ["BKN", "OVC", "VV"];
 
-const STATION_OVERRIDE: string | undefined = undefined;
+// NWS asks every client to identify itself with a contact address
+const NWS_HEADERS = { "User-Agent": "(acm-uic simple-ts-clock, officers@acm.cs.uic.edu)" };
+
+export const getNws = <T>(url: string): Promise<T> => fetchJson<T>(url, "NWS", NWS_HEADERS);
 
 type PointInfo = { forecastHourlyUrl: string; stationId: string };
 let point: PointInfo | undefined;
 
-// Contact for fetches
-const NWS_CONTACT = "officers@acm.cs.uic.edu";
-
-export async function getJson<T>(url: string): Promise<T> {
-  const res = await fetch(url, {
-    headers: { "User-Agent": `(acm-uic simple-ts-clock, ${NWS_CONTACT})` },
-    signal: AbortSignal.timeout(10_000),
-  });
-  if (!res.ok) throw new Error(`NWS ${res.status} for ${url}`);
-  return (await res.json()) as T;
-}
-
-async function getPoint(latLong: string): Promise<PointInfo> {
+// The forecast URL and nearest station for the clock's location never change, so look them up once
+async function getPoint(): Promise<PointInfo> {
   if (point) return point;
 
-  const arr = latLong.split(",").map((x) => parseFloat(x));
-  const lat = arr[0].toFixed(4);
-  const lon = arr[1].toFixed(4);
+  const points = await getNws<NwsPoints>(`https://api.weather.gov/points/${WEATHER_LAT_LONG}`);
+  const stations = await getNws<NwsStations>(points.properties.observationStations);
+  const stationId = stations.features[0]?.properties.stationIdentifier;
+  if (!stationId) throw new Error(`NWS returned no stations near ${WEATHER_LAT_LONG}`);
 
-  const points = await getJson<NwsPoints>(`https://api.weather.gov/points/${lat},${lon}`);
-
-  const stations = await getJson<NwsStations>(points.properties.observationStations);
-  const firstId = stations.features[0]?.properties.stationIdentifier;
-  const station = STATION_OVERRIDE ?? firstId;
-  if (!station) throw new Error("NWS returned no stations near " + latLong);
-
-  point = { forecastHourlyUrl: points.properties.forecastHourly, stationId: station };
+  point = { forecastHourlyUrl: points.properties.forecastHourly, stationId };
   return point;
 }
 
@@ -53,7 +43,7 @@ const MAX_OBSERVATION_AGE_MIN = 90;
 async function getFreshObservation(stationId: string): Promise<NwsObservation | undefined> {
   let observation: NwsObservation;
   try {
-    observation = await getJson<NwsObservation>(`https://api.weather.gov/stations/${stationId}/observations/latest`);
+    observation = await getNws<NwsObservation>(`https://api.weather.gov/stations/${stationId}/observations/latest`);
   } catch (err) {
     console.error("NWS observation failed, using forecast:", err);
     return undefined;
@@ -128,16 +118,9 @@ function fromObservation(obs: NwsObservation): Weather {
 }
 
 function fromForecast(period: NwsForecastPeriod): Weather {
-  const tempUnit = period.temperatureUnit;
-  let tempC: number;
-  let tempF: number;
-  if (tempUnit === "C") {
-    tempC = period.temperature;
-    tempF = Math.round((tempC * 9) / 5 + 32);
-  } else {
-    tempF = period.temperature;
-    tempC = Math.round(((tempF - 32) * 5) / 9);
-  }
+  const inC = period.temperatureUnit === "C";
+  const tempC = inC ? period.temperature : Math.round(((period.temperature - 32) * 5) / 9);
+  const tempF = inC ? Math.round((period.temperature * 9) / 5 + 32) : period.temperature;
   const normCond = normalizeCondition([], [], period.shortForecast);
 
   return {
@@ -152,12 +135,12 @@ function fromForecast(period: NwsForecastPeriod): Weather {
   };
 }
 
-async function fetchWeather(latLong: string): Promise<Weather> {
-  const { forecastHourlyUrl, stationId } = await getPoint(latLong);
+async function fetchWeather(): Promise<Weather> {
+  const { forecastHourlyUrl, stationId } = await getPoint();
   const obs = await getFreshObservation(stationId);
   if (obs) return fromObservation(obs);
 
-  const forecast = await getJson<NwsHourlyForecast>(forecastHourlyUrl);
+  const forecast = await getNws<NwsHourlyForecast>(forecastHourlyUrl);
   const periods = forecast.properties.periods;
 
   const now = Date.now();
@@ -166,11 +149,6 @@ async function fetchWeather(latLong: string): Promise<Weather> {
   return fromForecast(period);
 }
 
-let cachedWeather: (() => Promise<Weather>) | undefined;
-
-async function getWeather(weatherLatLong: string): Promise<Weather> {
-  cachedWeather ??= cached(() => fetchWeather(weatherLatLong), 10);
-  return cachedWeather();
-}
+const getWeather = cached(fetchWeather, 10);
 
 export default getWeather;

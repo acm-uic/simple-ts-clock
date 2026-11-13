@@ -1,7 +1,5 @@
-import dotenv from "dotenv";
-import type { CtaBusPrediction, CtaBusPredictions, Arrival } from "./transitTypes";
-
-dotenv.config();
+import { fetchJson } from "./fetchJson";
+import type { Arrival, CtaBusPrediction, CtaBusPredictions } from "./transitTypes";
 
 const CROWDING = ["EMPTY", "HALF_EMPTY", "FULL"] as const;
 // dyn codes from the Bus Tracker docs' "Dynamic Action Types" table: 1 canceled, 16/17 invalidated
@@ -17,9 +15,7 @@ async function getCtaBus(busStop: string): Promise<Arrival[]> {
     "&stpid=" +
     busStop +
     "&format=json";
-  const res = await fetch(url, { signal: AbortSignal.timeout(10_000) });
-  if (!res.ok) throw new Error(`CTA Bus Tracker HTTP ${res.status}`);
-  const data = (await res.json()) as CtaBusPredictions;
+  const data = await fetchJson<CtaBusPredictions>(url, "CTA Bus Tracker");
   const prd = data["bustime-response"]?.prd ?? [];
   const errors = data["bustime-response"]?.error ?? [];
   const real = errors.find((e) => !BENIGN_ERRORS.includes(e.msg));
