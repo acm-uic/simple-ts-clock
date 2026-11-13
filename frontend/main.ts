@@ -1,6 +1,17 @@
-import { getData } from "./getData";
+import { getData, renderGroups } from "./getData";
 import "@fontsource/montserrat";
+// Icons from the installed package, not a CDN, so they load even if the network is slow at boot
+import "@fortawesome/fontawesome-free/css/fontawesome.css";
+import "@fortawesome/fontawesome-free/css/solid.css";
 import "./main.css";
+import { type Panel, startRotator } from "./rotator";
+import type { CalEvent } from "../src/util/calendarTypes";
+import type { TickerItem } from "../src/util/tickerTypes";
+import type { Arrival, ArrivalGroup } from "../src/util/transitTypes";
+import { renderEvents } from "./events";
+import { flyersReady, setFlyers, showNextFlyer } from "./flyers";
+import { fitTicker, getMessages, renderTicker } from "./getMessages";
+import { startWeatherEffects } from "./weatherEffects";
 
 const timeElement = document.getElementById("time")!;
 const dateElement = document.getElementById("date")!;
@@ -19,45 +30,132 @@ const months = [
   "November",
   "December",
 ];
+const timeFormat = new Intl.DateTimeFormat("en-US", {
+  timeZone: "America/Chicago",
+  hour: "2-digit",
+  minute: "2-digit",
+});
 
 interface StringIndexes {
   [key: string]: string;
 }
 
+// Small helper so each demo arrival is one line
+const demoArrival = (minutes: number | "due", flags: Partial<Arrival> = {}): Arrival => ({
+  mode: "bus",
+  route: "",
+  direction: "",
+  destination: "",
+  stopName: "",
+  minutes,
+  delayed: false,
+  scheduledOnly: false,
+  fault: false,
+  canceled: false,
+  expressed: false,
+  ...flags,
+});
+
+const demoTransit: ArrivalGroup[] = [
+  {
+    mode: "train",
+    route: "Blue",
+    direction: "Forest Park-bound",
+    arrivals: [demoArrival("due"), demoArrival(9, { delayed: true })],
+  },
+  {
+    mode: "train",
+    route: "Blue",
+    direction: "O'Hare-bound",
+    arrivals: [demoArrival(10, { scheduledOnly: true })],
+  },
+  {
+    mode: "bus",
+    route: "8",
+    direction: "Northbound",
+    arrivals: [demoArrival(3, { crowding: "FULL" }), demoArrival(14)],
+  },
+  {
+    mode: "bus",
+    route: "60",
+    direction: "Westbound",
+    arrivals: [demoArrival(6)],
+  },
+];
+
+const demoTicker: TickerItem[] = [
+  { source: "weather", level: "severe", text: "Winter Storm Warning issued for Cook County until 6 PM", time: 0 },
+  { source: "cta", level: "warning", text: "Blue Line: Trains operating with delays near UIC-Halsted", time: 0 },
+  { source: "github", level: "info", text: "PR #54 merged in simple-ts-clock", time: 0 },
+  { source: "github", level: "info", text: "sammypatel06 pushed to simple-ts-clock", time: 0 },
+];
+
+// Demo events relative to now, so "happening now" and "finished" always show
+const HOUR = 60 * 60 * 1000;
+const at = (hoursFromNow: number) => new Date(Date.now() + hoursFromNow * HOUR).toISOString();
+const todayChicago = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date());
+const demoEvents: CalEvent[] = [
+  {
+    title: "Fall Hackathon Signups",
+    start: todayChicago,
+    end: "9999-12-31",
+    allDay: true,
+    label: "ACM",
+    color: "#1e6fd9",
+  },
+  {
+    title: "SIG Systems",
+    start: at(-3),
+    end: at(-2),
+    allDay: false,
+    location: "CDRLC 2433",
+    label: "ACM",
+    color: "#1e6fd9",
+  },
+  {
+    title: "Homebrew User Group",
+    start: at(-0.5),
+    end: at(1),
+    allDay: false,
+    location: "ACM/LUG Office: CDRLC 2433",
+    label: "LUG",
+    color: "#2e8b57",
+  },
+  {
+    title: "SIG AI Project",
+    start: at(2),
+    end: at(3),
+    allDay: false,
+    location: "CDRLC 2433",
+    label: "ACM",
+    color: "#1e6fd9",
+  },
+  { title: "Game Dev User Group", start: at(4), end: at(5.5), allDay: false, label: "LUG", color: "#2e8b57" },
+];
+
 const demoData: StringIndexes = {
-  bus: '<li class="busItem"><span class="route icon">60</span><span class="eta">6m</span><span class="direction">Westbound</span></li><li class="busItem"><span class="route icon">8</span><span class="eta">8m</span><span class="direction">Southbound</span></li><li class="busItem"><span class="route icon">7</span><span class="eta">10m</span><span class="direction">Westbound</span></li><li class="busItem"><span class="route icon">12</span><span class="eta">11m</span><span class="direction">Westbound</span></li><li class="busItem"><span class="route icon">8</span><span class="eta">13m</span><span class="direction">Northbound</span></li><li class="busItem"><span class="route icon">12</span><span class="eta">19m</span><span class="direction">Eastbound</span></li><li class="busItem"><span class="route icon">8</span><span class="eta">24m</span><span class="direction">Southbound</span></li><li class="busItem"><span class="route icon">60</span><span class="eta">6m</span><span class="direction">Westbound</span></li><li class="busItem"><span class="route icon">8</span><span class="eta">8m</span><span class="direction">Southbound</span></li><li class="busItem"><span class="route icon">7</span><span class="eta">10m</span><span class="direction">Westbound</span></li><li class="busItem"><span class="route icon">12</span><span class="eta">11m</span><span class="direction">Westbound</span></li><li class="busItem"><span class="route icon">8</span><span class="eta">13m</span><span class="direction">Northbound</span></li><li class="busItem"><span class="route icon">12</span><span class="eta">19m</span><span class="direction">Eastbound</span></li><li class="busItem"><span class="route icon">8</span><span class="eta">24m</span><span class="direction">Southbound</span></li>',
-  train: `<li class="trainItem"><i class="fa fa-train icon" style="background-color:#03396c;"></i><span class="eta" style="color:#03396c;border-color:#03396c;">3m</span><span class="direction">Forest Park</span></li><li class="trainItem"><i class="fa fa-train icon" style="background-color:#03396c;"></i><span class="eta" style="color:#03396c;border-color:#03396c;">6m</span><span class="direction">O'Hare</span></li><li class="trainItem"><i class="fa fa-train icon" style="background-color:#03396c;"></i><span class="eta" style="color:#03396c;border-color:#03396c;">15m</span><span class="direction">Forest Park</span></li><li class="trainItem"><i class="fa fa-train icon" style="background-color:#03396c;"></i><span class="eta" style="color:#03396c;border-color:#03396c;">15m</span><span class="direction">Forest Park</span></li><li class="trainItem"><i class="fa fa-train icon" style="background-color:#03396c;"></i><span class="eta" style="color:#03396c;border-color:#03396c;">19m</span><span class="direction">O'Hare</span></li>`,
-  weather: "<p>Overcast</p><p>13 °F | 25 °C</p>",
-  messages: "<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore eveniet pariatur sed expedita</p>",
-  events:
-    '<ul><li class="event happeningNow"><div class=eventName><span>Test Event 1</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 2</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 3</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 4</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 5</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 6</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 7</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div><li class=event><div class=eventName><span>Test Event 8</span></div><div class=eventDate><i class="fas icon fa-calendar-alt"></i><span>May 25</span></div><div class=eventTime><i class="fas icon fa-clock"></i><span>02:00 PM - 04:00 PM</span></div><div class=eventLocation><i class="fas icon fa-map-marker-alt"></i><span>SELE 2264</span></div></ul>',
+  bus: renderGroups(demoTransit, "bus"),
+  train: renderGroups(demoTransit, "train"),
+  weather: "<p>Mostly Clear (est.)</p><p>61 &#176;F | 16 &#176;C</p>",
+  messages: renderTicker(demoTicker),
+  events: renderEvents(demoEvents),
 };
 
 function updateTime(): void {
   const now = new Date();
-  const hour = now.getHours();
-  const min = now.getMinutes().toString().padStart(2, "0");
+  const nowFormat = timeFormat.formatToParts(now);
+  const hour = nowFormat.find((p) => p.type === "hour")?.value;
+  const min = nowFormat.find((p) => p.type === "minute")?.value;
   const date = now.getDate().toString().padStart(2, "0");
-  const hourstr = (hour > 12 ? hour - 12 : hour).toString().padStart(2, "0");
-
-  timeElement.innerHTML = `${hourstr}:${min}`;
+  timeElement.innerHTML = `${hour}:${min}`;
   dateElement.innerHTML = `${days[now.getDay()]} | ${months[now.getMonth()]} ${date}`;
-}
-
-const switcherElements = document.querySelectorAll<HTMLDivElement>("#switcher > div");
-let counter = 0;
-function switcher(): void {
-  if (counter === switcherElements.length) counter = 0;
-  const previous = counter === 0 ? switcherElements.length - 1 : counter - 1;
-  switcherElements[previous].style.left = "-1500px";
-  switcherElements[counter].style.left = "0px";
-  counter++;
 }
 
 window.onload = (): void => {
   const mode = window.location.pathname.split("/")[1];
   updateTime();
   setInterval(updateTime, 5000);
+  startWeatherEffects();
 
   switch (mode) {
     // biome-ignore lint/suspicious/noFallthroughSwitchClause: Hey man, the logic makes sense.
@@ -72,19 +170,55 @@ window.onload = (): void => {
         }
         element.innerHTML = demoData[key];
       }
+      fitTicker();
+      setFlyers([
+        { url: "/demo-flyers/tall.svg", name: "Demo flyer (tall)" },
+        { url: "/demo-flyers/wide.svg", name: "Demo flyer (wide)" },
+      ]);
     case "offline":
       document.getElementById(`${mode}Mode`)!.style.display = "block";
       break;
     default:
       getData();
       setInterval(getData, 120000);
+      getMessages();
+      setInterval(getMessages, 300000); // 5 minutes; the server caches each source too
       break;
   }
 
-  switcher();
-  if (switcherElements.length > 1) {
-    setInterval(switcher, 10000);
+  const PANEL_MS = 10_000;
+
+  const panels: Panel[] = [
+    {
+      id: "transit",
+      el: document.getElementById("transit")!,
+      durationMs: PANEL_MS,
+      isReady: () => document.querySelector("#bus li, #train li") !== null,
+    },
+  ];
+
+  const events = document.getElementById("events");
+  if (events) {
+    panels.push({
+      id: "events",
+      el: events,
+      durationMs: PANEL_MS,
+      isReady: () => events.querySelector("li.event:not(.finished)") !== null,
+    });
   }
+
+  const flyers = document.getElementById("flyers");
+  if (flyers) {
+    panels.push({
+      id: "flyers",
+      el: flyers,
+      durationMs: PANEL_MS,
+      isReady: flyersReady,
+      refresh: showNextFlyer, // a different flyer each turn
+    });
+  }
+
+  startRotator(panels, document.getElementById("fallback")!);
 
   window.onkeydown = (e: KeyboardEvent): void => {
     switch (e.code) {

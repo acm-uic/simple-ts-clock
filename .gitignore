@@ -107,3 +107,4 @@ $RECYCLE.BIN/
 
 
 # End of https://www.gitignore.io/api/node,linux,windows,prepros
+.DS_Store

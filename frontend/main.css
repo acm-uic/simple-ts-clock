@@ -12,6 +12,7 @@ body {
   -webkit-animation: Gradient 15s ease infinite;
   -moz-animation: Gradient 15s ease infinite;
   animation: Gradient 15s ease infinite;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
 }
 
 a {
@@ -126,14 +127,13 @@ body {
 
 /* Grid Layout */
 .wrapper {
-  width: 1080px;
-  height: 1920px;
-  max-height: 100%;
+  width: 100vw;
+  height: 100vh;
   border: 1px solid #000000;
   display: grid;
-  grid-template-areas: "time time time weather weather" "date date date date date" "acm-discord-qr-code-label acm-discord-qr-code lug-discord-qr-code-label lug-discord-qr-code messages" "switcher switcher switcher switcher switcher" "footer footer footer footer footer";
+  grid-template-areas: "time time time weather weather" "date date date date date" "acm-discord-qr-code-label acm-discord-qr-code lug-discord-qr-code-label lug-discord-qr-code ." "switcher switcher switcher switcher switcher" "messages messages messages messages messages";
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  grid-template-rows: 0.6fr 0.2fr 0.9fr 4fr 0.18fr;
+  grid-template-rows: 0.35fr 0.12fr 0.53fr 2fr 3rem;
   #time {
     grid-area: time;
   }
@@ -167,25 +167,151 @@ body {
     grid-area: lug-discord-qr-code;
     place-self: center;
   }
-  #footer {
-    grid-area: footer;
-  }
 }
 
 /* Switcher */
 #switcher {
-  margin: 0px 0px 100px 0px;
   position: relative;
   & > div {
     width: 100%;
+    height: 100%;
     position: absolute;
-    transition: all ease-in-out 1s;
-    left: -1500px;
+    transform: translateX(100%);
+    opacity: 0;
+    transition:
+      transform 600ms ease-in-out,
+      opacity 600ms ease-in-out;
+  }
+  & > div.is-active {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  & > div.is-leaving {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  & > div.no-transition {
+    transition: none;
+  }
+}
+
+#sky {
+  grid-row: 1 / 4;
+  grid-column: 1 / -1;
+  z-index: -1;
+  position: relative; /* children below are placed relative to the sky */
+  /* Bleed past the wrapper's 25px padding so the sky reaches the screen edges */
+  margin: -25px -25px 0;
+}
+#sky-canvas {
+  position: relative; /* drawn above the absolutely placed layers before it */
+  width: 100%;
+  height: 100%;
+  display: block; /* canvases are inline by default, which adds a gap below */
+  pointer-events: none; /* clicks go through to the page */
+}
+
+/* Sky tint: two stacked layers; JS swaps which one is visible to fade
+   between conditions (CSS can't animate from one gradient to another). */
+.sky-tint,
+.sky-night,
+.clouds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.sky-tint {
+  opacity: 0;
+  transition: opacity 3s ease;
+  &.is-visible {
+    opacity: 1;
+  }
+}
+/* Semi-transparent, so the page's animated gradient still shows through */
+.sky-clear {
+  background: linear-gradient(to bottom, rgba(70, 150, 230, 0.25), transparent);
+}
+.sky-cloudy {
+  background: linear-gradient(to bottom, rgba(120, 130, 145, 0.4), rgba(120, 130, 145, 0.1));
+}
+.sky-rain {
+  background: linear-gradient(to bottom, rgba(70, 85, 105, 0.5), rgba(70, 85, 105, 0.15));
+}
+.sky-storm {
+  background: linear-gradient(to bottom, rgba(30, 35, 50, 0.65), rgba(30, 35, 50, 0.25));
+}
+.sky-snow {
+  background: linear-gradient(to bottom, rgba(200, 210, 225, 0.35), rgba(200, 210, 225, 0.1));
+}
+.sky-fog {
+  background: rgba(210, 215, 220, 0.45);
+}
+/* Night darkens whatever the condition is */
+.sky-night {
+  background: linear-gradient(to bottom, rgba(10, 15, 40, 0.6), rgba(10, 15, 40, 0.3));
+  opacity: 0;
+  transition: opacity 3s ease;
+  &.is-visible {
+    opacity: 1;
+  }
+}
+
+/* Clouds: soft radial-gradient blobs drifting slowly. JS sets --cloudiness
+   (how visible) and --cloud-rgb (white, grey, or dark) from the condition. */
+.clouds {
+  overflow: hidden;
+  opacity: var(--cloudiness, 0.2);
+  transition: opacity 3s ease;
+}
+.cloud {
+  position: absolute;
+  width: 60%;
+  height: 70%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(var(--cloud-rgb, 255, 255, 255), 0.8), transparent);
+  animation: cloud-drift 120s linear infinite;
+}
+/* Different heights, sizes, and speeds; negative delays spread them out at load */
+.cloud:nth-child(1) {
+  top: -20%;
+  animation-duration: 140s;
+  animation-delay: -20s;
+}
+.cloud:nth-child(2) {
+  top: 15%;
+  width: 45%;
+  animation-duration: 110s;
+  animation-delay: -70s;
+}
+.cloud:nth-child(3) {
+  top: 40%;
+  width: 70%;
+  animation-duration: 160s;
+  animation-delay: -110s;
+}
+.cloud:nth-child(4) {
+  top: 5%;
+  width: 40%;
+  animation-duration: 95s;
+  animation-delay: -40s;
+}
+@keyframes cloud-drift {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(180%);
   }
 }
 
 .wrapper {
   padding: 25px;
+  isolation: isolate;
+}
+
+.wrapper > * {
+  min-height: 0;
+  overflow: hidden;
 }
 
 #time {
@@ -197,95 +323,137 @@ body {
 }
 
 #weather {
-  font-size: 1.5em;
+  font-size: 1.7em;
   text-align: right;
-  margin-top: 35px;
-  i,
   p {
     display: block;
     margin: 0;
   }
-  i {
-    font-size: 1.5em;
+  p:first-child {
+    /* the description: smaller, one line, "…" if too long */
+    font-size: 0.6em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
+/* Ticker: the bottom row. The content is in the track twice; sliding left by
+   half the track (one copy) and starting over loops without a visible jump. */
 #messages {
-  display: none;
+  grid-area: messages;
+  display: flex;
+  align-items: center;
+  font-size: 0.6em;
+  white-space: nowrap;
+}
+.ticker-track {
+  display: flex;
+  animation: ticker-scroll var(--ticker-duration, 60s) linear infinite;
+}
+.ticker-copy {
+  display: flex;
+  flex: none;
+}
+.ticker-item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+  padding: 0 1.5em;
+}
+.ticker-source {
+  font-size: 0.7em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid currentColor;
+  border-radius: 0.3em;
+  padding: 0 0.35em;
+}
+.ticker-item.severe {
+  background: #c10000;
+  border-radius: 0.3em;
+}
+.ticker-item.warning .ticker-source {
+  background: #f2b33d;
+  border-color: #f2b33d;
+  color: #000000;
+  text-shadow: none;
+}
+@keyframes ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 #cta {
+  font-size: 1.25em;
   ul {
     list-style: none;
-    clear: both;
-    li {
-      padding: 10px 0;
-      width: 50%;
-      float: left;
-    }
+    margin: 0;
+    padding: 0;
   }
-  .icon,
-  .route,
-  .direction,
-  .eta {
-    display: inline-block;
-    margin-right: 10px;
-    line-height: 80px;
+  .group {
+    display: flex; /* badge, direction and arrivals in one row */
+    align-items: baseline; /* line items up on their text, so flags don't shift the times */
+    gap: 0.5em; /* space between them */
+    padding: 0.3em 0;
   }
-  .direction {
-    font-size: 0.81em;
-    margin: 0px;
-    position: relative;
-    width: 250px;
-    left: -50px;
-    top: 25px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .eta {
-    width: 155px;
-    height: 80px;
-    border: 3px solid #ffffff;
-    border-left: none;
-    padding-left: 20px;
-    padding-right: 5px;
-    position: relative;
-    left: -50px;
-    text-align: right;
-  }
-  .icon {
-    border-radius: 50%;
-    height: 80px;
-    width: 80px;
-    text-align: center;
+  .route.icon {
+    flex: none; /* never shrink */
+    min-width: 2.2em;
+    height: 2.2em;
+    padding: 0 0.4em;
+    border-radius: 1.1em; /* a pill: a circle for "8", wider for "Blue" */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7em;
     font-weight: bold;
   }
-  #bus {
-    .icon {
-      border: 3px solid #ffffff;
-    }
-    li {
-      display: none;
-    }
-    li:nth-child(-n + 14) {
-      display: list-item;
-    }
+  .direction {
+    flex: 1; /* takes the leftover space */
+    min-width: 0; /* allows shrinking below its text width */
+    font-size: 0.75em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* "…" instead of a hard cut */
   }
-  #train {
-    .icon {
-      background-color: #000000;
-    }
-    .eta {
-      border-color: #000000;
-      color: #000000;
-    }
-    li {
-      display: none;
-    }
-    li:nth-child(-n + 6) {
-      display: list-item;
-    }
+  .arrival {
+    flex: none;
+    min-width: 3em;
+    display: flex;
+    flex-direction: column; /* the time on top, flags below it */
+    align-items: flex-end;
+  }
+  .time {
+    font-weight: bold;
+  }
+  .flag {
+    font-size: 0.55em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .flag.delayed {
+    background: #c10000;
+    color: #ffffff;
+    border-radius: 0.3em;
+    padding: 0 0.3em;
+  }
+  .flag.scheduled {
+    opacity: 0.8;
+  }
+  .flag.full {
+    border: 1px solid currentColor;
+    border-radius: 0.3em;
+    padding: 0 0.3em;
+  }
+  #bus .route.icon {
+    border: 3px solid #ffffff; /* buses have no line color */
   }
 }
 
@@ -293,28 +461,67 @@ body {
   ul {
     font-size: 0.75em;
     list-style: none;
-    clear: both;
-    li.event {
-      padding: 15px;
-      float: left;
-      width: 50%;
-      span {
-        margin: 5px 0;
-      }
-      .eventName {
-        font-size: 1.15em;
-        margin-bottom: 5px;
-      }
-      .icon {
-        width: 1.25em;
-      }
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5em 1em;
+  }
+  li.event {
+    padding: 15px;
+    min-width: 0; /* let long titles shrink instead of widening the column */
+    span {
+      margin: 5px 0;
     }
-    li.event.happeningNow {
-      .eventName {
-        text-decoration: underline;
-      }
+    .eventName {
+      font-size: 1.15em;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: baseline;
+      gap: 0.4em;
+    }
+    .eventLabel {
+      flex: none;
+      font-size: 0.6em;
+      font-weight: 600;
+      padding: 0.1em 0.4em;
+      border-radius: 0.3em;
+      text-shadow: none;
+    }
+    .icon {
+      width: 1.25em;
     }
   }
+  li.event.happeningNow {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 0.4em;
+  }
+  li.event.finished {
+    opacity: 0.5;
+  }
+}
+
+/* Flyers: the flyer fits inside the panel without stretching; a blurred,
+   darkened copy behind it fills the empty space. */
+#flyers .flyer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  img {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+.flyer-bg {
+  position: absolute;
+  inset: -40px; /* past the edges, so the blur doesn't fade out at the borders */
+  background-size: cover;
+  background-position: center;
+  filter: blur(30px) brightness(0.5);
 }
 
 img.qrCode {
@@ -324,9 +531,4 @@ img.qrCode {
 
 #app-repo-qr-code {
   display: none;
-}
-
-#footer {
-  text-align: center;
-  font-size: 0.5em;
 }
