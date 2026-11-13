@@ -203,6 +203,18 @@ body {
   /* Bleed past the wrapper's 25px padding so the sky reaches the screen edges */
   margin: -25px -25px 0;
 }
+/* Divider: a bar along the sky's bottom edge, so the tint, clouds, and rain
+   end on a deliberate line instead of being cut off above the panels. */
+#sky::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+}
 #sky-canvas {
   position: relative; /* drawn above the absolutely placed layers before it */
   width: 100%;
