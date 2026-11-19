@@ -30,6 +30,10 @@
     enable = true;
   };
 
+  # If the whole machine locks up, its hardware timer (SP5100 TCO) reboots it:
+  # systemd checks in with the timer, and 30 seconds of silence means a hang.
+  systemd.watchdog.runtimeTime = "30s";
+
   age.secrets.acmclock = {
     file = ../enc.env;
   };
